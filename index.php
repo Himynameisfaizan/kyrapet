@@ -376,8 +376,6 @@ include 'includes/header.php';
 
         <div class="row g-4">
             <?php
-            // Fetch active products (dogs) from the 'products' table
-            // Only fetching where status = 1 (Active) and limiting to 8 for the home page
             $dog_query = "SELECT pro_id, pro_name, short_desc, mrp, selling_price, pro_img, slug_url, new_arrival 
                           FROM products 
                           WHERE status = 1 
@@ -387,22 +385,18 @@ include 'includes/header.php';
             if($dog_result->num_rows > 0) {
                 while($dog = $dog_result->fetch_assoc()) {
                     
-                    // Assigning variables safely
                     $name = htmlspecialchars($dog['pro_name']);
                     $slug = htmlspecialchars($dog['slug_url']);
                     $selling_price = number_format((float)$dog['selling_price'], 2);
                     $mrp = number_format((float)$dog['mrp'], 2);
                     
-                    // Image logic (Assuming images are stored in a folder like 'uploads/products/')
-                    $image = !empty($dog['pro_img']) ? "uploads/products/" . htmlspecialchars($dog['pro_img']) : "assets/images/default-dog.jpg";
+                    $image = !empty($dog['pro_img']) ? "admin/assets/img/uploads/" . htmlspecialchars($dog['pro_img']) : "assets/images/default-dog.jpg";
                     
-                    // Dummy features for UI (You can add these columns in your DB later if needed)
                     $age = "8 Weeks";
                     $gender = rand(0,1) ? "Male" : "Female";
                     
                     ?>
                     
-                    <!-- Single Pet Card -->
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="pet-card">
                             
@@ -471,6 +465,436 @@ include 'includes/header.php';
     </div>
 </section>
 
+<!-- Premium Custom CSS for Rest of the Sections -->
+<style>
+    /* Global Section Spacing */
+    .premium-section {
+        padding: 90px 0;
+    }
+    
+    .bg-light-grey {
+        background-color: #f8fafc;
+    }
+
+    .section-title-wrap {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    .section-title-wrap .sub-title {
+        color: var(--brand-teal);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+    }
+    .section-title-wrap h2 {
+        color: var(--brand-navy);
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+
+    /* 1. Testimonial Styling */
+    .testimonial-card {
+        background: var(--bg-pure-white);
+        padding: 40px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        text-align: center;
+        transition: transform 0.3s ease;
+        position: relative;
+        height: 100%;
+    }
+    .testimonial-card:hover {
+        transform: translateY(-10px);
+    }
+    .quote-icon {
+        color: rgba(0, 168, 181, 0.15);
+        font-size: 3rem;
+        position: absolute;
+        top: 20px;
+        left: 30px;
+    }
+    .testi-msg {
+        font-style: italic;
+        color: var(--text-gray);
+        margin-bottom: 25px;
+        position: relative;
+        z-index: 2;
+    }
+    .client-info h5 {
+        color: var(--brand-navy);
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    .client-info span {
+        color: var(--brand-teal);
+        font-size: 0.85rem;
+    }
+
+    /* 2. Gallery Styling */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .gallery-item {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .gallery-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(29, 53, 87, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+    }
+    .gallery-overlay i {
+        color: white;
+        font-size: 2rem;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+    .gallery-item:hover .gallery-overlay i {
+        transform: translateY(0);
+    }
+
+    /* 3. Blog Styling */
+    .blog-card {
+        background: var(--bg-pure-white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .blog-card:hover {
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+    }
+    .blog-img {
+        height: 220px;
+        overflow: hidden;
+    }
+    .blog-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    .blog-card:hover .blog-img img {
+        transform: scale(1.05);
+    }
+    .blog-content {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .blog-meta {
+        font-size: 0.85rem;
+        color: var(--brand-teal);
+        margin-bottom: 10px;
+    }
+    .blog-title {
+        color: var(--brand-navy);
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        text-decoration: none;
+    }
+    .blog-title:hover {
+        color: var(--brand-teal);
+    }
+    .read-more {
+        margin-top: auto;
+        color: var(--brand-navy);
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s;
+    }
+    .read-more:hover {
+        color: var(--brand-teal);
+    }
+    .read-more i {
+        margin-left: 5px;
+        transition: transform 0.3s;
+    }
+    .read-more:hover i {
+        transform: translateX(5px);
+    }
+
+    /* 4. Inquiry / Contact Styling */
+    .contact-wrapper {
+        background: var(--bg-pure-white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    }
+    .map-container {
+        height: 100%;
+        min-height: 400px;
+    }
+    .map-container iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+    .form-container {
+        padding: 50px 40px;
+        background: var(--bg-pure-white);
+    }
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+        background: #f8fafc;
+    }
+    .form-control:focus {
+        border-color: var(--brand-teal);
+        box-shadow: 0 0 0 0.2rem rgba(0, 168, 181, 0.15);
+        background: white;
+    }
+    .submit-btn {
+        background: var(--brand-navy);
+        color: white;
+        border-radius: 30px;
+        padding: 12px 30px;
+        border: none;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s;
+    }
+    .submit-btn:hover {
+        background: var(--brand-teal);
+        transform: translateY(-2px);
+    }
+</style>
+
+<!-- ================= 1. Happy Pet Owners (Testimonials) ================= -->
+<section class="premium-section fade-in">
+    <div class="container">
+        <div class="section-title-wrap">
+            <span class="sub-title"><i class="fas fa-heart me-2"></i> Happy Families</span>
+            <h2>What Our Pet Parents Say</h2>
+        </div>
+        
+        <div class="row g-4">
+            <?php
+            // Fetch Testimonials from database[cite: 2]
+            $testi_query = "SELECT name, designation, message FROM testimonials WHERE status = 1 ORDER BY test_id DESC LIMIT 3";
+            $testi_result = $conn->query($testi_query);
+            
+            if($testi_result->num_rows > 0) {
+                while($testi = $testi_result->fetch_assoc()) {
+                    ?>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="testimonial-card">
+                            <i class="fas fa-quote-left quote-icon"></i>
+                            <!-- htmlspecialchars is used for security, but text can be long so we truncate if needed -->
+                            <p class="testi-msg">"<?php echo strip_tags($testi['message']); ?>"</p>
+                            <div class="client-info mt-4">
+                                <h5><?php echo htmlspecialchars($testi['name']); ?></h5>
+                                <span><?php echo htmlspecialchars($testi['designation']); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            } else {
+                echo '<p class="text-center">No reviews yet. Be the first to review us!</p>';
+            }
+            ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= 2. Pet Gallery Section ================= -->
+<section class="premium-section bg-light-grey fade-in">
+    <div class="container">
+        <div class="section-title-wrap">
+            <span class="sub-title"><i class="fas fa-camera me-2"></i> Adorable Moments</span>
+            <h2>Our Pet Gallery</h2>
+        </div>
+        
+        <div class="gallery-grid">
+            <?php
+            // Fetch Gallery Images[cite: 2]
+            $gallery_query = "SELECT image_name, image_path FROM gallery ORDER BY ID DESC LIMIT 6";
+            $gallery_result = $conn->query($gallery_query);
+            
+            if($gallery_result->num_rows > 0) {
+                while($img = $gallery_result->fetch_assoc()) {
+                    $img_src = !empty($img['image_path']) ? htmlspecialchars($img['image_path']) : 'assets/images/default-gallery.jpg';
+                    ?>
+                    <div class="gallery-item">
+                        <img src="admin/<?php echo $img_src; ?>" alt="Kyra Pet Shop Gallery">
+                        <div class="gallery-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                    <?php
+                }
+            } else {
+                // Fallback UI agar DB me images nahi hain
+                for($i=1; $i<=6; $i++) {
+                    echo '<div class="gallery-item"><img src="assets/images/placeholder-gallery-'.$i.'.jpg" alt="Pet Image"><div class="gallery-overlay"><i class="fas fa-search-plus"></i></div></div>';
+                }
+            }
+            ?>
+        </div>
+        <div class="text-center mt-5">
+            <a href="gallery.php" class="btn btn-premium">View Full Gallery</a>
+        </div>
+    </div>
+</section>
+
+<!-- ================= 3. Latest Pet Blogs Section ================= -->
+<section class="premium-section fade-in">
+    <div class="container">
+        <div class="section-title-wrap">
+            <span class="sub-title"><i class="fas fa-book-open me-2"></i> Pet Care Tips</span>
+            <h2>Latest From Our Blog</h2>
+        </div>
+        
+        <div class="row g-4">
+            <?php
+            // Fetch Blogs[cite: 2]
+            $blog_query = "SELECT title, slug, image, created_at, description FROM blogs WHERE status = 1 ORDER BY blog_id DESC LIMIT 3";
+            $blog_result = $conn->query($blog_query);
+            
+            if($blog_result->num_rows > 0) {
+                while($blog = $blog_result->fetch_assoc()) {
+                    $blog_img = !empty($blog['image']) ? "admin/assets/img/uploads/blogs/".$blog['image'] : "assets/images/default-blog.jpg";
+                    // Format Date
+                    $blog_date = date("M d, Y", strtotime($blog['created_at']));
+                    ?>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="blog-card">
+                            <div class="blog-img">
+                                <a href="blog-details.php?slug=<?php echo $blog['slug']; ?>">
+                                    <img src="<?php echo $blog_img; ?>" alt="<?php echo htmlspecialchars($blog['title']); ?>">
+                                </a>
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <i class="far fa-calendar-alt me-1"></i> <?php echo $blog_date; ?> 
+                                    <i class="fas fa-paw ms-3 me-1"></i> Kyra Pets
+                                </div>
+                                <a href="blog-details.php?slug=<?php echo $blog['slug']; ?>" class="blog-title">
+                                    <?php echo htmlspecialchars($blog['title']); ?>
+                                </a>
+                                <!-- Truncate description for preview -->
+                                <p class="text-muted" style="font-size: 0.9rem;">
+                                    <?php echo substr(strip_tags($blog['description']), 0, 90) . '...'; ?>
+                                </p>
+                                <a href="blog-details.php?slug=<?php echo $blog['slug']; ?>" class="read-more">
+                                    Read Article <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
+        </div>
+    </div>
+</section>
+
+<!-- ================= 4. Inquiry & Contact Section ================= -->
+<section class="premium-section bg-light-grey fade-in" id="inquiry-section">
+    <div class="container">
+        <div class="section-title-wrap">
+            <span class="sub-title"><i class="fas fa-envelope me-2"></i> Get In Touch</span>
+            <h2>Send Us an Inquiry</h2>
+        </div>
+        
+        <div class="contact-wrapper">
+            <div class="row g-0">
+                <?php
+                // Fetch Map and Contact info[cite: 2]
+                $contact_query = "SELECT map FROM contacts ORDER BY id DESC LIMIT 1";
+                $contact_result = $conn->query($contact_query);
+                $map_url = "";
+                if($contact_result->num_rows > 0) {
+                    $contact_data = $contact_result->fetch_assoc();
+                    $map_url = $contact_data['map'];
+                }
+                ?>
+                <!-- Left Side: Map -->
+                <div class="col-lg-6">
+                    <div class="map-container">
+                        <?php if(!empty($map_url)): ?>
+                            <iframe src="<?php echo $map_url; ?>" allowfullscreen="" loading="lazy"></iframe>
+                        <?php else: ?>
+                            <!-- Fallback Map for WZ-23 khampur Patel nagar, New Delhi -->
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.5977936168536!2d77.15926711508282!3d28.64182188241402!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd3d2cf5707b%3A0x6b637b38c227eb0!2sPatel%20Nagar%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1689874561234!5m2!1sen!2sin" allowfullscreen="" loading="lazy"></iframe>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <!-- Right Side: Dynamic Inquiry Form -->
+                <div class="col-lg-6">
+                    <div class="form-container">
+                        <h4 class="mb-4" style="color: var(--brand-navy); font-weight: 700;">Looking for a specific breed?</h4>
+                        <p class="text-muted mb-4">Fill out the form below and Mr. Nitin will get back to you shortly.</p>
+                        
+                        <!-- Form submits data to inquiries table (create process_inquiry.php for backend)[cite: 2] -->
+                        <form action="process_inquiry.php" method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number" required>
+                                </div>
+                                <div class="col-12">
+                                    <input type="email" name="email" class="form-control" placeholder="Email Address (Optional)">
+                                </div>
+                                <div class="col-12">
+                                    <input type="text" name="subject" class="form-control" placeholder="Which breed are you looking for?" required>
+                                </div>
+                                <div class="col-12">
+                                    <textarea name="message" rows="4" class="form-control" placeholder="Any specific requirements? (Age, Gender, etc.)"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="submit-btn">
+                                        Send Inquiry <i class="fas fa-paper-plane ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Content Section ke liye space -->
 <section class="py-5 bg-light text-center">
     <div class="container fade-in">
@@ -485,5 +909,5 @@ include 'includes/header.php';
 
 <?php 
 // 4. Footer Include
-// include 'includes/footer.php'; 
+include 'includes/footer.php'; 
 ?>
