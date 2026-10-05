@@ -416,12 +416,12 @@ include 'includes/header.php';
                                     <h3 class="pet-title"><?php echo $name; ?></h3>
                                 </a>
                                 
-                                <div class="pet-price-box">
+                                <!-- <div class="pet-price-box">
                                     <span class="selling-price">₹<?php echo $selling_price; ?></span>
                                     <?php if($dog['mrp'] > $dog['selling_price']): ?>
                                         <span class="mrp-price">₹<?php echo $mrp; ?></span>
                                     <?php endif; ?>
-                                </div>
+                                </div> -->
                                 
                                 <!-- Pet Specific Info (UI enhancement) -->
                                 <div class="pet-features">
