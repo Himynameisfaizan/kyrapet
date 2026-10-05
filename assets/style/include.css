@@ -1,0 +1,116 @@
+:root {
+  --brand-teal: #00a8b5;
+  --brand-navy: #1d3557;
+  --bg-pure-white: #ffffff;
+  --text-gray: #555555;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #fafbfc;
+  color: var(--text-gray);
+  overflow-x: hidden;
+}
+
+/* ============================
+    HEADER SECTION STYLING
+================================ */
+
+.fade-in {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-navbar {
+  background-color: var(--bg-pure-white);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 12px 0;
+  transition: all 0.4s ease;
+}
+
+.navbar-brand img {
+  max-height: 65px;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+  transform: scale(1.05);
+}
+
+.nav-link {
+  color: var(--brand-navy) !important;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0 12px;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: var(--brand-teal);
+  transition: width 0.3s ease-in-out;
+}
+
+.nav-link:hover,
+.nav-item.active .nav-link {
+  color: var(--brand-teal) !important;
+}
+
+.nav-link:hover::after,
+.nav-item.active .nav-link::after {
+  width: 100%;
+}
+
+.btn-premium {
+  background-color: var(--brand-teal);
+  color: var(--bg-pure-white);
+  border-radius: 50px;
+  padding: 10px 25px;
+  font-weight: 600;
+  border: 2px solid var(--brand-teal);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-premium:hover {
+  background-color: transparent;
+  color: var(--brand-teal);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 168, 181, 0.25);
+}
+
+.top-bar {
+  background-color: var(--brand-navy);
+  color: white;
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.top-bar a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.top-bar a:hover {
+  color: var(--brand-teal);
+}
