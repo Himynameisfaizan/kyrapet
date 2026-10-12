@@ -1,4 +1,6 @@
 <?php
+include ('config/connect.php');
+include ('includes/config.php');
 $title = $title ?? $site['name'];
 $desc  = $desc  ?? 'Premium pure breed puppies in New Delhi. Vet checked and 100% vaccinated.';
 $page  = $page  ?? '';

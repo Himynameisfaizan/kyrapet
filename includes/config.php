@@ -11,18 +11,22 @@ $site = [
   'g_write'  =>'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID',
   'insta'=>'#','fb'=>'#','yt'=>'#',
 ];
-// Unsplash helper (free to use under the Unsplash License)
-function ph($id,$w=900){ return "https://images.unsplash.com/photo-$id?auto=format&fit=crop&q=75&w=$w"; }
+
+// --- YAHA PE CHANGE KARNA HAI --- 
+if (!function_exists('ph')) {
+    function ph($id,$w=900){ return "https://images.unsplash.com/photo-$id?auto=format&fit=crop&q=75&w=$w"; }
+}
+// ---------------------------------
+
 $P = [
   'golden'=>'1447029080250-270ded608d91','lab'=>'1422565096762-bdb997a56a84','pug'=>'1423958950820-4f2f1f44e075',
   'bulldog'=>'1456534231849-7d5fcd82d77b','chow'=>'1446231855385-1d4b0f025248','grass'=>'1442605527737-ed62b867591f',
   'tan'=>'1426287658398-5a912ce1ed0a','tongue'=>'1457144759132-40d119c2f120','sweater'=>'1470390356535-d19bbf47bacb',
   'pug2'=>'1455380579765-810023662ea2','black'=>'1477936432016-8172ed08637e','grey'=>'1477973770766-6228305816df',
 ];
-// Rating summary (use your real Google numbers)
+
 $rating = ['score'=>'4.9','count'=>'16','bars'=>[5=>94,4=>6,3=>0,2=>0,1=>0]];
 $stats = [['420','+','Happy clients'],['600','+','Happy pets'],['25','+','Years of experience'],['100','%','Satisfaction']];
-// YouTube: only the video ID (after v=)
 $vids = [
   ['aKeiqtnY6Go','From our shop to your home'],
   ['TM08ew9Zcpw','Real clients, real smiles'],
@@ -35,8 +39,13 @@ $vids = [
   ['OJHSFNsC7qY','Happy puppy buying experience'],
 ];  // rename the titles to match each video
 $v1=array_slice($vids,0,3);$v2=array_slice($vids,3,3);$v3=array_slice($vids,6,3);
-function vcard($v,$i=0){return '<button class="vid sv" data-yt="'.htmlspecialchars($v[0]).'" aria-label="Play video: '.htmlspecialchars($v[1]).'" style="--i:'.$i.'"><img src="https://i.ytimg.com/vi/'.htmlspecialchars($v[0]).'/hqdefault.jpg" alt="" loading="lazy" onerror="this.style.opacity=.2"><span class="play"></span><span class="cap">'.htmlspecialchars($v[1]).'</span></button>';}
-// Reviews: use ONLY real reviews copied from your Google profile. src: google | facebook | justdial
+
+// --- BAKI FUNCTIONS MEIN BHI ADD KAR DENA SAFE RAHEGA ---
+if (!function_exists('vcard')) {
+    function vcard($v,$i=0){return '<button class="vid sv" data-yt="'.htmlspecialchars($v[0]).'" aria-label="Play video: '.htmlspecialchars($v[1]).'" style="--i:'.$i.'"><img src="https://i.ytimg.com/vi/'.htmlspecialchars($v[0]).'/hqdefault.jpg" alt="" loading="lazy" onerror="this.style.opacity=.2"><span class="play"></span><span class="cap">'.htmlspecialchars($v[1]).'</span></button>';}
+}
+// --------------------------------------------------------
+
 $reviews = [
   ['Amit Sharma','Local Guide · 14 reviews','2 weeks ago',5,'google','Humne kaafi time se ek pure breed puppy dhoondh rahe the. Kyra Pet Shop ki team ne health records ekdum transparent rakhe. Genuine pet lovers!','#1a73e8'],
   ['Sneha Kapoor','8 reviews','1 month ago',5,'google','Pehli baar dog adopt kar rahi thi aur nervous thi. Team ne har cheez samjhayi, feeding se vaccination tak. Best pet shop in Patel Nagar!','#e8710a'],
@@ -78,9 +87,19 @@ $faq = [
   ['How do I choose the right breed for my family?','Tell us about your home, family and daily routine. We will suggest breeds that fit.'],
   ['Can I book or reserve a puppy in advance?','Yes. Send us an inquiry or WhatsApp message and we will share photos, videos and health details first.'],
 ];
-function h($s){return htmlspecialchars($s,ENT_QUOTES,'UTF-8');}
-function gicon($s=20){return '<svg width="'.$s.'" height="'.$s.'" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';}
-function stars($n){return '<span class="stars" aria-label="'.$n.' out of 5 stars">'.str_repeat('★',$n).'</span>';}
+
+// --- YAHAN BHI CHECK LAGA DO ---
+if (!function_exists('h')) {
+    function h($s){return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8');}
+}
+if (!function_exists('gicon')) {
+    function gicon($s=20){return '<svg width="'.$s.'" height="'.$s.'" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';}
+}
+if (!function_exists('stars')) {
+    function stars($n){return '<span class="stars" aria-label="'.$n.' out of 5 stars">'.str_repeat('★',$n).'</span>';}
+}
+// ---------------------------------
+
 $tel=str_replace(' ','',$site['phone']);
 
 /* ================= MULTI-PAGE DATA ================= */
@@ -159,27 +178,35 @@ $gal = [
 ];
 
 /* ================= HELPERS ================= */
+if (!function_exists('dog_card')) {
 function dog_card($d,$site){ $t=rawurlencode("Hi Kyra Pet Shop, I am interested in: ".$d['name']); $u='breed.php?slug='.urlencode($d['slug']); ?>
 <article class="card pitem rv" data-cat="<?=h($d['breed'])?>" data-gender="<?=h($d['gender'])?>" data-text="<?=h(strtolower($d['name'].' '.$d['breed']))?>" data-order="<?=(int)$d['n']?>">
   <a class="im" href="<?=$u?>"><?php if($d['img']): ?><img src="<?=h(strpos($d['img'],'/')!==false?$d['img']:ph($d['img'],700))?>" alt="<?=h($d['name'])?>" loading="lazy"><?php else: ?><span class="noimg"><b>🐾</b><?=h($d['breed'])?></span><?php endif; ?><span class="ok">✓ Vaccinated</span></a>
   <div class="bd"><h3><a href="<?=$u?>"><?=h($d['name'])?></a></h3><div class="meta"><?=h($d['age'])?> &nbsp;|&nbsp; <?=h($d['gender'])?> &nbsp;|&nbsp; <?=h($d['breed'])?></div>
     <div class="row"><a class="btn" href="<?=$u?>">Details</a><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/<?=h($site['wa'])?>?text=<?=$t?>">Inquire</a></div></div>
 </article><?php }
+}
 
+if (!function_exists('blog_card')) {
 function blog_card($b){ $u='blog-post.php?slug='.urlencode($b['slug']); ?>
 <article class="bcard rv" data-cat="<?=h($b['cat'])?>">
   <a class="bim" href="<?=$u?>"><img src="<?=ph($b['img'],700)?>" alt="<?=h($b['title'])?>" loading="lazy"><span class="bc"><?=h($b['cat'])?></span></a>
   <div class="bb"><div class="bmeta"><?=h($b['date'])?> · <?=h($b['read'])?></div><h3><a href="<?=$u?>"><?=h($b['title'])?></a></h3><p><?=h($b['excerpt'])?></p><a class="more" href="<?=$u?>">Read article →</a></div>
 </article><?php }
+}
 
+if (!function_exists('banner')) {
 function banner($h1,$crumb,$sub=''){ ?>
 <section class="pbanner"><div class="blob b1"></div><div class="blob b2"></div>
   <?php for($k=0;$k<7;$k++): ?><span class="paw" style="left:<?=($k*14+8)%96?>%;animation-delay:<?=$k*1.6?>s;font-size:<?=16+($k%3)*8?>px">🐾</span><?php endfor; ?>
   <div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="index.php">Home</a><span>/</span><b><?=h($crumb)?></b></nav>
     <h1 class="split"><?=h($h1)?></h1><?php if($sub): ?><p class="seq"><?=h($sub)?></p><?php endif; ?></div></section><?php }
+}
 
+if (!function_exists('cta_band')) {
 function cta_band($title='Ready to meet your new best friend?',$text=''){ global $site; ?>
 <div class="band"><div class="wrap"><div class="in rv">
   <div><h2><?=h($title)?></h2><p><?=h($text?:'Visit us '.$site['hours'].' or message us on WhatsApp.')?></p></div>
   <a class="btn" target="_blank" rel="noopener" href="https://wa.me/<?=h($site['wa'])?>?text=<?=rawurlencode('Hi Kyra Pet Shop, I would like to visit and see the puppies.')?>">Chat on WhatsApp</a>
 </div></div></div><?php }
+}

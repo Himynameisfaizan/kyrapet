@@ -1,3 +1,4 @@
+<?php include ('includes/config.php'); ?>
 <footer><div class="wrap">
   <div class="ft">
     <div><img src="assets/img/logo.png" alt="Kyra Pet Shop" style="height:52px;margin-bottom:16px;background:#fff;border-radius:12px;padding:5px"><p>Healthy, premium dog breeds in New Delhi. Find your perfect companion with us today.</p>
