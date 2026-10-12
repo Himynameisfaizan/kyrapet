@@ -188,11 +188,19 @@ function dog_card($d,$site){ $t=rawurlencode("Hi Kyra Pet Shop, I am interested 
 }
 
 if (!function_exists('blog_card')) {
-function blog_card($b){ $u='blog-post.php?slug='.urlencode($b['slug']); ?>
-<article class="bcard rv" data-cat="<?=h($b['cat'])?>">
-  <a class="bim" href="<?=$u?>"><img src="<?=ph($b['img'],700)?>" alt="<?=h($b['title'])?>" loading="lazy"><span class="bc"><?=h($b['cat'])?></span></a>
-  <div class="bb"><div class="bmeta"><?=h($b['date'])?> · <?=h($b['read'])?></div><h3><a href="<?=$u?>"><?=h($b['title'])?></a></h3><p><?=h($b['excerpt'])?></p><a class="more" href="<?=$u?>">Read article →</a></div>
-</article><?php }
+    function blog_card($b){ $u='blog-post.php?slug='.urlencode($b['slug']); ?>
+    <article class="bcard rv" data-cat="<?=h($b['cat'])?>">
+      <a class="bim" href="<?=$u?>">
+        <img src="<?=h(strpos($b['img'],'/')!==false ? $b['img'] : ph($b['img'],700))?>" alt="<?=h($b['title'])?>" loading="lazy">
+        <span class="bc"><?=h($b['cat'])?></span>
+      </a>
+      <div class="bb">
+        <div class="bmeta"><?=h($b['date'])?> · <?=h($b['read'])?></div>
+        <h3><a href="<?=$u?>"><?=h($b['title'])?></a></h3>
+        <p><?=h($b['excerpt'])?></p>
+        <a class="more" href="<?=$u?>">Read article →</a>
+      </div>
+    </article><?php }
 }
 
 if (!function_exists('banner')) {

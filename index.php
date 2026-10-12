@@ -67,13 +67,28 @@ while($row = mysqli_fetch_assoc($rev_q)) {
 // Gallery Section
 $gallery = [];
 $gal_q = mysqli_query($conn, "SELECT * FROM gallery ORDER BY ID DESC LIMIT 8");
-while($row = mysqli_fetch_assoc($gal_q)) { $gallery[] = $row['image_path']; }
+while($row = mysqli_fetch_assoc($gal_q)) { 
+    $gallery[] = 'admin/' . $row['image_path']; 
+}
 
 // Blog Section
 $blog = [];
 $blog_q = mysqli_query($conn, "SELECT * FROM blogs WHERE status=1 ORDER BY created_at DESC LIMIT 3");
-while($row = mysqli_fetch_assoc($blog_q)) { $blog[] = $row; }
-
+while($row = mysqli_fetch_assoc($blog_q)) { 
+    // Description column se HTML tags hata kar short text (excerpt) bana rahe hain
+    $desc = strip_tags($row['description']);
+    $excerpt = mb_substr($desc, 0, 100) . '...';
+    
+    $blog[] = [
+        'slug'    => $row['slug'],
+        'title'   => $row['title'],
+        'cat'     => 'Pet Care', 
+        'date'    => date('M d, Y', strtotime($row['created_at'])),
+        'read'    => '5 min read',
+        'img'     => 'admin/assets/img/uploads/blogs/' . $row['image'],
+        'excerpt' => $excerpt
+    ]; 
+}
 // Contact & Map Data
 $contact_q = mysqli_query($conn, "SELECT * FROM contacts LIMIT 1");
 $contact = mysqli_fetch_assoc($contact_q);
@@ -269,7 +284,13 @@ require __DIR__.'/includes/header.php';
 <!-- GALLERY (Dynamic DB) -->
 <section id="gallery"><div class="wrap">
   <div class="sec-head c"><span class="tag">Gallery</span><h2>Adorable moments at Kyra</h2></div>
-  <div class="gal-grid"><?php foreach($gallery as $g): ?><a class="rv" href="<?=ph($g,1600)?>" target="_blank" rel="noopener"><img src="admin/<?=ph($g,800)?>" alt="Puppy at Kyra Pet Shop" loading="lazy"></a><?php endforeach; ?></div>
+  <div class="gal-grid">
+    <?php foreach($gallery as $g): ?>
+      <a class="rv" href="<?= h($g) ?>" target="_blank" rel="noopener">
+        <img src="<?= h($g) ?>" alt="Puppy at Kyra Pet Shop" loading="lazy">
+      </a>
+    <?php endforeach; ?>
+  </div>
   <div class="center"><a class="btn btn-teal" href="gallery.php">View full gallery</a> &nbsp; <a class="btn btn-navy" href="<?=h($site['insta']??'')?>" target="_blank" rel="noopener">Follow us on Instagram</a></div>
 </div></section>
 
