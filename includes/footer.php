@@ -6,7 +6,7 @@
     <div><h4>Quick links</h4><ul><li><a href="about.php">About us</a></li><li><a href="how-it-works.php">How it works</a></li><li><a href="reviews.php">Reviews</a></li><li><a href="breeds.php">Our breeds</a></li><li><a href="gallery.php">Gallery</a></li><li><a href="blog.php">Blog</a></li><li><a href="contact.php">Contact</a></li></ul></div>
     <div><h4>Contact</h4><ul><li><?=h($site['addr'])?></li><li><a href="tel:<?=h($tel)?>"><?=h($site['phone'])?></a></li><li><a href="mailto:<?=h($site['email'])?>"><?=h($site['email'])?></a></li><li><?=h($site['hours'])?></li></ul></div>
   </div>
-  <div class="copy">&copy; <?=date('Y')?> Kyra Pet Shop. All rights reserved. Design & Developed by Unsplash contributors.</div>
+  <div class="copy">&copy; <?=date('Y')?> Kyra Pet Shop. All rights reserved. Design & Developed by <a href="digitalwebtrackers.com"></a>.</div>
 </div></footer>
 
 <a class="fab call" href="tel:<?=h($tel)?>" aria-label="Call Kyra Pet Shop"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg></a>
