@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/config/connect.php'; // Database connection add kiya
+require __DIR__.'/config/connect.php'; 
 require __DIR__.'/includes/config.php';
 
 $page = 'breeds';
@@ -29,7 +29,7 @@ if($breed_q) {
 // ==========================================
 // 3. PAGINATION & FILTER LOGIC
 // ==========================================
-$limit = 12; // Ek page par kitne puppies dikhane hain
+$limit = 12; 
 $current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($current_page - 1) * $limit;
 
@@ -63,16 +63,16 @@ if ($count_q) {
 }
 $total_pages = ceil($total_rows / $limit);
 
-// Fetch Products from Database
-$dogs = [];
+// Fetch Products from Database - Array renamed to $db_dogs to prevent overwrite
+$db_dogs = [];
 $prod_q = mysqli_query($conn, "SELECT * FROM products WHERE $where_sql $order_by LIMIT $offset, $limit");
 if ($prod_q) {
     while ($row = mysqli_fetch_assoc($prod_q)) {
-        $dogs[] = [
+        $db_dogs[] = [
             'slug'   => $row['slug_url'],
             'name'   => $row['pro_name'],
             'breed'  => $row['brand_name'] ?? 'Dog',
-            'gender' => 'Male/Female', // DB me gender column nahi hai, default lagaya hai
+            'gender' => 'Male/Female', 
             'age'    => '8 Weeks',
             'img'    => !empty($row['pro_img']) ? 'admin/assets/img/uploads/' . $row['pro_img'] : null,
             'n'      => $row['id']
@@ -117,13 +117,13 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
   </div>
   
   <!-- RESULT COUNT -->
-  <div class="count" id="cnt">Showing <?= count($dogs) ?> of <?= $total_rows ?> puppies</div>
+  <div class="count" id="cnt">Showing <?= count($db_dogs) ?> of <?= $total_rows ?> puppies</div>
   
-  <!-- PRODUCTS GRID -->
+  <!-- PRODUCTS GRID USING $db_dogs -->
   <div class="grid4" id="grid">
     <?php 
-    if (!empty($dogs)) {
-        foreach($dogs as $d) {
+    if (!empty($db_dogs)) {
+        foreach($db_dogs as $d) {
             if (function_exists('dog_card')) dog_card($d, $site); 
         }
     } 
@@ -131,7 +131,7 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
   </div>
   
   <!-- EMPTY STATE -->
-  <?php if (empty($dogs)): ?>
+  <?php if (empty($db_dogs)): ?>
     <div class="empty" id="empty" style="display:block;">
         <b>No puppies match your search</b><br>
         Try another breed, or message us. New puppies arrive often.
@@ -143,7 +143,6 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
   <div class="pagination" style="display: flex; justify-content: center; gap: 10px; margin-top: 40px; flex-wrap: wrap;">
       <?php for ($i = 1; $i <= $total_pages; $i++): ?>
           <?php 
-              // Preserve existing filters (search, breed, sort) in URL
               $query = $_GET;
               $query['page'] = $i;
               $query_string = http_build_query($query);
