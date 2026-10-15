@@ -6,13 +6,13 @@ ini_set('display_errors', 1);
 include "db-conn.php";
 
 if (isset($_POST["add-categories"])) {
-    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {$fileTmpPath = $_FILES['imageUpload']['tmp_name'];$fileName = $_FILES['imageUpload']['name'];$fileNameCmps = explode(".", $fileName);$fileExtension = strtolower(end($fileNameCmps));$allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
-
+    $fileName = '';
+    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {$fileTmpPath = $_FILES['imageUpload']['tmp_name'];$fileName = $_FILES['imageUpload']['name'];$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));$allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
         if (in_array($fileExtension,$allowedExtensions)) {
             $newFileName = uniqid('img_', true) . '.' .$fileExtension;
             $uploadDir = 'uploads/category/';
-            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }$destPath = $uploadDir .$newFileName;
-            move_uploaded_file($fileTmpPath,$destPath);
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }
+            move_uploaded_file($fileTmpPath, $uploadDir .$newFileName);
             $fileName =$newFileName;
         }
     }
@@ -21,88 +21,47 @@ if (isset($_POST["add-categories"])) {
     $meta_title = mysqli_real_escape_string($conn,$_POST["meta_title"]);
     $meta_key = mysqli_real_escape_string($conn,$_POST["meta_key"]);
     $meta_desc = mysqli_real_escape_string($conn,$_POST["meta_desc"]);
+    $schema_markup = mysqli_real_escape_string($conn, trim($_POST["schema_markup"] ?? ''));
+    $status = mysqli_real_escape_string($conn,$_POST["status"] ?? '1');
     $slug_url = strtolower(str_replace(" ", "-", $cate_name));
 
-    $sql = "INSERT INTO `categories` (`cate_id`, `categories`, `meta_title`, `meta_desc`, `meta_key`, `image`, `slug_url`, `status`, `added_on`) 
-            VALUES ('$cate_id', '$cate_name', '$meta_title', '$meta_desc', '$meta_key', '$fileName', '$slug_url', 1, NOW())";
-    mysqli_query($conn,$sql);
-    echo "<script>alert('Inserted Successfully!'); window.location.href = 'view-categories.php';</script>";
+    $sql = "INSERT INTO `categories` (`cate_id`, `categories`, `meta_title`, `meta_desc`, `meta_key`, `schema_markup`, `image`, `slug_url`, `status`, `added_on`) 
+            VALUES ('$cate_id', '$cate_name', '$meta_title', '$meta_desc', '$meta_key', '$schema_markup', '$fileName', '$slug_url', '$status', NOW())";
+    
+    if (mysqli_query($conn,$sql)) {
+        echo "<script>alert('Category Inserted Successfully!'); window.location.href = 'view-categories.php';</script>";
+    } else {
+        echo "SQL Error: " . mysqli_error($conn);
+    }
 }
 
 if (isset($_POST["add-sub-categories"])) {
-
-    $uploadedImage = ''; // default empty value
-    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {
-        // File details
-        $fileTmpPath = $_FILES['imageUpload']['tmp_name'];
-        $fileName = $_FILES['imageUpload']['name'];
-        // $fileSize and$fileType are retrieved but not used
-        // $fileSize =$_FILES['imageUpload']['size'];
-        // $fileType =$_FILES['imageUpload']['type'];
-
-        // Get file extension
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-
-        // Allowed file extensions
-        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
-
-        // Check if file type is allowed
-        if (in_array($fileExtension, $allowedExtensions)) {
-            // Create a unique filename
-            $newFileName = uniqid('img_', true) . '.' . $fileExtension;
-
-            // Define upload directory
+    $uploadedImage = ''; 
+    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {$fileTmpPath = $_FILES['imageUpload']['tmp_name'];$fileName = $_FILES['imageUpload']['name'];$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));$allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+        if (in_array($fileExtension,$allowedExtensions)) {
+            $newFileName = uniqid('img_', true) . '.' .$fileExtension;
             $uploadDir = 'uploads/sub-category/';
-
-            // Create directory if it doesn't exist
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true); // Create with full permissions
-            }
-
-            // Final file destination
-            $destPath = $uploadDir . $newFileName;
-
-            // Move uploaded file
-            if (move_uploaded_file($fileTmpPath, $destPath)) {
-                echo "✅ File uploaded successfully! <br>";
-                echo "📂 Saved at: <a href='$destPath'>$destPath</a>";
-                $uploadedImage = $newFileName; // use the new unique filename for database
-            } else {
-                echo "❌ Error: Could not move file!";
-            }
-        } else {
-            echo "❌ Error: Only JPG, JPEG, PNG, GIF, and WEBP files are allowed!";
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }
+            move_uploaded_file($fileTmpPath, $uploadDir .$newFileName);
+            $uploadedImage =$newFileName;
         }
     }
 
-    // If no file was uploaded, you may want to set a default image filename or leave empty.
-    if (empty($uploadedImage)) {
-        // echo "<script>alert('Image is not uploaded!!')</script>";
-        // $uploadedImage = 'default_image.jpg'; 
-        // or empty string if you wish
-    }
+    $cate_id       = mt_rand(11111, 99999);
+    $parent_id     = mysqli_real_escape_string($conn, $_POST['parent_id']);$cate_name     = mysqli_real_escape_string($conn,$_POST["cate_name"]);
+    $meta_title    = mysqli_real_escape_string($conn,$_POST["meta_title"]);
+    $meta_key      = mysqli_real_escape_string($conn,$_POST["meta_key"]);
+    $meta_desc     = mysqli_real_escape_string($conn,$_POST["meta_desc"]);
+    $schema_markup = mysqli_real_escape_string($conn, trim($_POST["schema_markup"] ?? ''));
+    $status        = mysqli_real_escape_string($conn,$_POST["status"] ?? '1');
+    $added_on      = date('M d, Y');
+    $slug_url      = strtolower(str_replace(" ", "-", $cate_name));
 
-    $cate_id    = mt_rand(11111, 99999);
-    $cate_name  = mysqli_real_escape_string($conn, $_POST["cate_name"]);
-    $meta_title = mysqli_real_escape_string($conn, $_POST["meta_title"]);
-    $meta_key   = mysqli_real_escape_string($conn, $_POST["meta_key"]);
-    $meta_desc  = mysqli_real_escape_string($conn, $_POST["meta_desc"]);
-    $added_on   = date('M d, Y');
-    $parent_id  = mysqli_real_escape_string($conn, $_POST['parent_id']);
-    $slug_url   = strtolower(str_replace(" ", "-", $cate_name));
+    $sql = "INSERT INTO `sub_categories` (`parent_id`, `cate_id`, `categories`, `meta_title`, `meta_desc`, `meta_key`, `schema_markup`, `sub_cat_img`, `slug_url`, `status`, `added_on`) 
+            VALUES ('$parent_id', '$cate_id', '$cate_name', '$meta_title', '$meta_desc', '$meta_key', '$schema_markup', '$uploadedImage', '$slug_url', '$status', '$added_on')";
 
-    $sql = "INSERT INTO `sub_categories`( `parent_id`,`cate_id`, `categories`, `meta_title`, `meta_desc`, `meta_key`, `sub_cat_img`, `slug_url`, `status`, `added_on`) 
-            VALUES ('$parent_id','$cate_id','$cate_name','$meta_title','$meta_desc','$meta_key', '$uploadedImage', '$slug_url', 1, '$added_on')";
-
-    $check = mysqli_query($conn, $sql);
-    if ($check) {
-?>
-        <script type="text/javascript">
-            alert('Inserted Successfully!');
-            window.location.href = "view-sub-categories.php";
-        </script>
-    <?php
+    if (mysqli_query($conn,$sql)) {
+        echo "<script>alert('Sub-Category Inserted Successfully!'); window.location.href = 'view-sub-categories.php';</script>";
     } else {
         echo "Error inserting record: " . mysqli_error($conn);
     }

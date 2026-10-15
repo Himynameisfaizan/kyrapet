@@ -19,7 +19,7 @@ $schema_data = mysqli_fetch_assoc($schema_q);
 // 2. FETCH DYNAMIC CATEGORIES (BREEDS)
 // ==========================================
 $breedNames = [];
-$breed_q = mysqli_query($conn, "SELECT DISTINCT brand_name FROM products WHERE status=1 AND pro_cate=34158 AND brand_name IS NOT NULL AND brand_name != ''");
+$breed_q = mysqli_query($conn, "SELECT DISTINCT brand_name FROM products WHERE status=1 AND brand_name IS NOT NULL AND brand_name != ''");
 if($breed_q) {
     while($b_row = mysqli_fetch_assoc($breed_q)){
         $breedNames[] = $b_row['brand_name'];

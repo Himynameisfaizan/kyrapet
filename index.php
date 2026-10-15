@@ -40,7 +40,7 @@ $about = mysqli_fetch_assoc($about_q);
 
 // Dog Products
 $db_dogs = [];
-$prod_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 AND pro_cate=34158 ORDER BY id DESC LIMIT 4");
+$prod_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 ORDER BY id DESC LIMIT 4");
 if ($prod_q) {
   while ($row = mysqli_fetch_assoc($prod_q)) {
     $db_dogs[] = [
