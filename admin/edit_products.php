@@ -5,29 +5,22 @@ include "db-conn.php";
 include "functions.php";
 
 if (!isset($_GET['edit_product_details'])) {
-    die("Product ID is missing from the URL.");
+    die("Breed ID is missing from the URL.");
 }
 
 $product_id = intval($_GET['edit_product_details']);
 
-// Fetch product details using mysqli_query()
 $query = "SELECT * FROM products WHERE pro_id = $product_id";
-$result = mysqli_query($conn, $query);
+$result = mysqli_query($conn,$query);
 
 if ($result && mysqli_num_rows($result) > 0) {
     $product = mysqli_fetch_assoc($result);
 } else {
-    die("Product not found.");
+    die("Breed not found.");
 }
 
-// Fetch Parent Categories
 $sql = "SELECT * FROM `categories` WHERE `status` = 1 ORDER BY id DESC";
-$check = mysqli_query($conn, $sql);
-
-// Fetch Subcategories for the selected parent category
-$parent_cate_id = $product['pro_cate'];
-$sub_cate_query = "SELECT * FROM `sub_categories` WHERE cate_id = '$parent_cate_id' AND status = 1";
-$sub_categories = mysqli_query($conn,$sub_cate_query);
+$check = mysqli_query($conn,$sql);
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +29,7 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Admin - Edit Product</title>
+    <title>Kyra Admin - Edit Breed</title>
     <link rel="icon" href="assets/img/logo.png" type="image/png">
     <?php include "links.php"; ?>
 </head>
@@ -62,7 +55,7 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
                             <div class="white_card_header">
                                 <div class="box_header m-0">
                                     <div class="main-title">
-                                        <h2 class="m-0">Update Product Details</h2>
+                                        <h2 class="m-0">Update Breed Details</h2>
                                     </div>
                                 </div>
                             </div>
@@ -75,13 +68,13 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
                                         <input type="hidden" name="id" value="<?= $product['id'] ?>" />
 
                                         <div class="row mb-3">
-                                            <!-- Product Name -->
+                                            <!-- Breed Name -->
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="pro_name">Product Name</label>
+                                                <label class="form-label" for="pro_name">Breed Title / Name</label>
                                                 <input type="text" class="form-control" name="pro_name" id="pro_name" value="<?= htmlspecialchars($product['pro_name']) ?>" required />
                                             </div>
 
-                                            <!-- NEW: Custom Slug Field -->
+                                            <!-- Slug Field -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label" for="slug_url">Custom Slug (SEO URL)</label>
                                                 <div class="input-group">
@@ -90,16 +83,16 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
                                                 </div>
                                             </div>
 
-                                            <!-- Brand Name -->
+                                            <!-- Breed Brand Name -->
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="brand_name">Brand Name</label>
-                                                <input type="text" class="form-control" name="brand_name" id="brand_name" value="<?= htmlspecialchars($product['brand_name'] ?? '') ?>" />
+                                                <label class="form-label" for="brand_name">Breed Type Name</label>
+                                                <input type="text" class="form-control" name="brand_name" id="brand_name" value="<?= htmlspecialchars($product['brand_name'] ?? '') ?>" required />
                                             </div>
 
                                             <!-- Parent Category -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label" for="pro_cate">Parent Category</label>
-                                                <select class="form-control" name="pro_cate" id="pro_cate" required onchange="get_subcategory(this.value)">
+                                                <select class="form-control" name="pro_cate" id="pro_cate" required>
                                                     <option value="">--Select Category--</option>
                                                     <?php foreach ($check as$val) { ?>
                                                         <option value="<?= $val['cate_id'] ?>" <?= ($product['pro_cate'] ==$val['cate_id']) ? 'selected' : '' ?>>
@@ -107,88 +100,80 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
                                                         </option>
                                                     <?php } ?>
                                                 </select>
+                                                <input type="hidden" name="pro_sub_cate" value="0">
                                             </div>
 
-                                            <!-- Sub Category -->
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="pro_sub_cate">Sub Category</label>
-                                                <select class="form-control" name="pro_sub_cate" id="subcate_id">
-                                                    <option value="0">--Select Subcategory--</option>
-                                                    <?php 
-                                                    if ($sub_categories && mysqli_num_rows($sub_categories) > 0) {
-                                                        while ($sub_cate = mysqli_fetch_assoc($sub_categories)) {$selected = ($product['pro_sub_cate'] ==$sub_cate['id']) ? 'selected' : '';
-                                                    ?>
-                                                            <option value="<?= $sub_cate['id'] ?>" <?= $selected ?>>
-                                                                <?= ucwords(htmlspecialchars($sub_cate['categories'])) ?>
-                                                            </option>
-                                                    <?php 
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
+                                            <!-- SPECS FIELDS: Gender, Age, Size, Temperament -->
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="gender">Gender</label>
+                                                <input type="text" class="form-control" name="gender" id="gender" value="<?= htmlspecialchars($product['gender'] ?? 'Male / Female') ?>" required />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="age">Age</label>
+                                                <input type="text" class="form-control" name="age" id="age" value="<?= htmlspecialchars($product['age'] ?? '8 Weeks') ?>" required />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="size">Adult Size</label>
+                                                <input type="text" class="form-control" name="size" id="size" value="<?= htmlspecialchars($product['size'] ?? 'Medium to Large') ?>" required />
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label" for="temper">Temperament</label>
+                                                <input type="text" class="form-control" name="temper" id="temper" value="<?= htmlspecialchars($product['temper'] ?? 'Friendly, playful, loyal') ?>" required />
                                             </div>
 
                                             <!-- Stock -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label" for="stock">Stock Quantity</label>
-                                                <input type="number" class="form-control" name="stock" id="stock" value="<?= $product['stock'] ?>" required />
+                                                <input type="text" class="form-control" name="stock" id="stock" value="<?= $product['stock'] ?>" required />
                                             </div>
 
-                                            <!-- Product Image -->
+                                            <!-- Main Featured Image -->
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="pro_img">Product Image</label>
+                                                <label class="form-label" for="pro_img">Main Featured Image</label>
                                                 <input type="file" class="form-control" name="pro_img" id="pro_img" accept="image/*" />
                                                 <input type="hidden" name="old_img" value="<?= $product['pro_img'] ?>">
                                                 <?php if(!empty($product['pro_img'])): ?>
                                                 <div class="mt-2">
                                                     <small class="text-muted">Current Image:</small>
                                                     <div class="mt-1">
-                                                        <img src="assets/img/uploads/<?= trim($product['pro_img']) ?>" style="height: 100px; width: 100px; object-fit: contain; border-radius: 8px; border: 1px solid #ccc;" alt="Current Product Image">
+                                                        <img src="assets/img/uploads/<?= trim($product['pro_img']) ?>" style="height: 80px; width: 80px; object-fit: contain; border-radius: 8px; border: 1px solid #ccc;" alt="Current Image">
                                                     </div>
                                                 </div>
                                                 <?php endif; ?>
                                             </div>
 
-                                            <!-- Exclusive Deal -->
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="new_arrival">Exclusive Deal</label>
-                                                <select id="new_arrival" name="new_arrival" class="form-control">
-                                                    <option value="0" <?= $product['new_arrival'] == 0 ? 'selected' : '' ?>>No</option>
-                                                    <option value="1" <?= $product['new_arrival'] == 1 ? 'selected' : '' ?>>Yes</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Special Offers -->
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label" for="trending">Special Offers</label>
-                                                <select id="trending" name="trending" class="form-control">
-                                                    <option value="0" <?= $product['trending'] == 0 ? 'selected' : '' ?>>No</option>
-                                                    <option value="1" <?= $product['trending'] == 1 ? 'selected' : '' ?>>Yes</option>
-                                                </select>
+                                            <!-- MULTI-ANGLE GALLERY IMAGES UPLOAD -->
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label fw-bold text-primary" for="gallery_images">Add More Gallery Images (Multi-Angle)</label>
+                                                <input type="file" class="form-control" name="gallery_images[]" id="gallery_images" multiple />
+                                                <small class="text-muted">Nayi images select karne par yeh is breed ke gallery mein add ho jayengi.</small>
+                                                
+                                                <!-- Show existing multi-angle images from product_images table -->
+                                                <?php
+                                                $p_db_id = (int)$product['id'];
+                                                $g_res = mysqli_query($conn, "SELECT * FROM product_images WHERE product_id = $p_db_id");
+                                                if ($g_res && mysqli_num_rows($g_res) > 0) {
+                                                    echo '<div class="d-flex flex-wrap gap-2 mt-2">';
+                                                    while($g_row = mysqli_fetch_assoc($g_res)) {
+                                                        $g_path =$g_row['image_path'];
+                                                        $full_path = (strpos($g_path, 'uploads/') !== false) ? $g_path : 'assets/img/uploads/' .$g_path;
+                                                        echo '<div style="position:relative; display:inline-block;"><img src="'.$full_path.'" style="height:60px;width:60px;object-fit:cover;border-radius:6px;border:1px solid #ddd;"></div>';
+                                                    }
+                                                    echo '</div>';
+                                                }
+                                                ?>
                                             </div>
 
                                             <!-- Short Description -->
                                             <div class="col-md-12 mb-3">
-                                                <label class="form-label" for="short_desc">Short Description</label>
+                                                <label class="form-label" for="short_desc">Short Overview</label>
                                                 <textarea class="form-control" name="short_desc" id="short_desc" required><?= $product['short_desc'] ?></textarea>
                                             </div>
 
                                             <!-- Long Description -->
                                             <div class="col-md-12 mb-3">
-                                                <label class="form-label" for="pro_desc">Long Description</label>
+                                                <label class="form-label" for="pro_desc">Detailed Long Description</label>
                                                 <textarea class="form-control" name="pro_desc" id="pro_desc" required><?= $product['description'] ?></textarea>
-                                            </div>
-
-                                            <!-- MRP -->
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label" for="mrp">MRP</label>
-                                                <input type="text" class="form-control" name="mrp" id="mrp" value="<?= $product['mrp'] ?>" required />
-                                            </div>
-
-                                            <!-- Selling Price -->
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label" for="selling_price">Selling Price</label>
-                                                <input type="text" class="form-control" name="selling_price" id="selling_price" value="<?= $product['selling_price'] ?>" required />
                                             </div>
 
                                             <!-- Status -->
@@ -216,17 +201,14 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
                                                 <label class="form-label" for="meta_desc">Meta Description</label>
                                                 <input type="text" class="form-control" name="meta_desc" id="meta_desc" value="<?= htmlspecialchars($product['meta_desc'] ?? '') ?>" />
                                             </div>
-                                            
-                                            <!-- Schema Markup Box -->
                                             <div class="col-md-12 mb-3">
                                                 <label class="form-label fw-bold" for="schema_markup">SEO Schema Markup (JSON-LD)</label>
-                                                <textarea class="form-control" name="schema_markup" id="schema_markup" rows="6"><?= htmlspecialchars($product['schema_markup'] ?? '') ?></textarea>
-                                                <small class="text-muted">SEO expert yahan product ka custom schema (jaise Product, Price, Rating) paste kar sakte hain.</small>
+                                                <textarea class="form-control" name="schema_markup" id="schema_markup" rows="4"><?= htmlspecialchars($product['schema_markup'] ?? '') ?></textarea>
                                             </div>
                                         </div>
 
                                         <button type="submit" name="update-product" class="btn btn-primary px-5 py-2">
-                                            <i class="fas fa-save me-2"></i> Update Product
+                                            <i class="fas fa-save me-2"></i> Update Breed
                                         </button>
                                     </form>
                                 </div>
@@ -238,49 +220,10 @@ $sub_categories = mysqli_query($conn,$sub_cate_query);
         </div>
 
         <?php include "footer.php"; ?>
-
         <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
-
         <script>
-            if (document.getElementById('pro_desc')) {
-                CKEDITOR.replace('pro_desc');
-            }
-            if (document.getElementById('short_desc')) {
-                CKEDITOR.replace('short_desc');
-            }
-
-            // Slug Auto-Formatting
-            function convertToSlug(text) {
-                return text.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-            }
-            
-            document.getElementById('slug_url').addEventListener('blur', function() {
-                this.value = convertToSlug(this.value);
-            });
-        </script>
-
-        <script type="text/javascript">
-            function get_subcategory(cate_id) {
-                if (cate_id === '') {
-                    $("#subcate_id").html('<option value="0">--Select Subcategory--</option>');
-                    return;
-                }
-                
-                $.ajax({
-                    url: 'functions.php',
-                    method: 'POST',
-                    data: { 
-                        action: 'get_subcategories', 
-                        cate_id: cate_id 
-                    },
-                    success: function (data) {
-                        $("#subcate_id").html(data);
-                    },
-                    error: function () {
-                        alert("Network error: Could not fetch subcategories.");
-                    }
-                });
-            }
+            if (document.getElementById('pro_desc')) { CKEDITOR.replace('pro_desc'); }
+            if (document.getElementById('short_desc')) { CKEDITOR.replace('short_desc'); }
         </script>
     </section>
 </body>

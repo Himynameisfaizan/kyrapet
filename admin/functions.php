@@ -6,66 +6,27 @@ ini_set('display_errors', 1);
 include "db-conn.php";
 
 if (isset($_POST["add-categories"])) {
+    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {$fileTmpPath = $_FILES['imageUpload']['tmp_name'];$fileName = $_FILES['imageUpload']['name'];$fileNameCmps = explode(".", $fileName);$fileExtension = strtolower(end($fileNameCmps));$allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
 
-    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {
-        // File details
-        $fileTmpPath = $_FILES['imageUpload']['tmp_name'];
-        $fileName = $_FILES['imageUpload']['name'];
-        $fileSize = $_FILES['imageUpload']['size'];
-        $fileType = $_FILES['imageUpload']['type'];
-
-        // Get file extension
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-
-        // Allowed file extensions
-        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
-
-        // Check if file type is allowed
-        if (in_array($fileExtension, $allowedExtensions)) {
-            // Create a unique filename
-            $newFileName = uniqid('img_', true) . '.' . $fileExtension;
-
-            // Define upload directory
+        if (in_array($fileExtension,$allowedExtensions)) {
+            $newFileName = uniqid('img_', true) . '.' .$fileExtension;
             $uploadDir = 'uploads/category/';
-
-            // Create directory if it doesn't exist
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true); // Create with full permissions
-            }
-
-            // Final file destination
-            $destPath = $uploadDir . $newFileName;
-
-            // Move uploaded file
-            if (move_uploaded_file($fileTmpPath, $destPath)) {
-                echo "✅ File uploaded successfully! <br>";
-                echo "📂 Saved at: <a href='$destPath'>$destPath</a>";
-            } else {
-                echo "❌ Error: Could not move file!";
-            }
-        } else {
-            echo "❌ Error: Only JPG, JPEG, PNG, and GIF files are allowed!";
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }$destPath = $uploadDir .$newFileName;
+            move_uploaded_file($fileTmpPath,$destPath);
+            $fileName =$newFileName;
         }
     }
 
-    $cate_id = mt_rand(11111, 99999);
-    $cate_name = mysqli_real_escape_string($conn, $_POST["cate_name"]);
-    $meta_title = mysqli_real_escape_string($conn, $_POST["meta_title"]);
-    $meta_key = mysqli_real_escape_string($conn, $_POST["meta_key"]);
-    $meta_desc = mysqli_real_escape_string($conn, $_POST["meta_desc"]);
-    $slug_url = strtolower(str_replace(" ", "-", $cate_name)); // Temp fix for SlugUrl()
+    $cate_id = mt_rand(11111, 99999);$cate_name = mysqli_real_escape_string($conn,$_POST["cate_name"]);
+    $meta_title = mysqli_real_escape_string($conn,$_POST["meta_title"]);
+    $meta_key = mysqli_real_escape_string($conn,$_POST["meta_key"]);
+    $meta_desc = mysqli_real_escape_string($conn,$_POST["meta_desc"]);
+    $slug_url = strtolower(str_replace(" ", "-", $cate_name));
 
     $sql = "INSERT INTO `categories` (`cate_id`, `categories`, `meta_title`, `meta_desc`, `meta_key`, `image`, `slug_url`, `status`, `added_on`) 
             VALUES ('$cate_id', '$cate_name', '$meta_title', '$meta_desc', '$meta_key', '$fileName', '$slug_url', 1, NOW())";
-
-    $check = mysqli_query($conn, $sql);
-
-    if (!$check) {
-        die("SQL Error: " . mysqli_error($conn)); // Debugging SQL error
-    } else {
-        echo "<script>alert('Inserted Successfully!'); window.location.href = 'view-categories.php';</script>";
-    }
+    mysqli_query($conn,$sql);
+    echo "<script>alert('Inserted Successfully!'); window.location.href = 'view-categories.php';</script>";
 }
 
 if (isset($_POST["add-sub-categories"])) {
@@ -169,71 +130,53 @@ function get_Category()
 }
 
 if (isset($_POST["add-product"])) {
-    $pro_id = mt_rand(11111, 99999);
-    $pro_name       = mysqli_real_escape_string($conn, $_POST['pro_name']);
-    $brand_name       = mysqli_real_escape_string($conn, $_POST['brand_name']);
-    $pro_cate       = mysqli_real_escape_string($conn, $_POST['pro_cate']);
-    $pro_sub_cate   = mysqli_real_escape_string($conn, $_POST['pro_sub_cate']);
-    $short_description    = mysqli_real_escape_string($conn, $_POST['short_desc']);
-    $description    = mysqli_real_escape_string($conn, $_POST['pro_desc']);
-    $new_arrival    = mysqli_real_escape_string($conn, $_POST['new_arrival']);
-    $trending    = mysqli_real_escape_string($conn, $_POST['trending']);
-    $whole_sale_selling_price  = isset($_POST['whole_selling_price']) ? mysqli_real_escape_string($conn, $_POST['whole_selling_price']) : '';
-    $qty            = isset($_POST['qty']) ? mysqli_real_escape_string($conn, $_POST['qty']) : '';
-    $mrp            = mysqli_real_escape_string($conn, $_POST['mrp']);
-    $selling_price  = mysqli_real_escape_string($conn, $_POST['selling_price']);
-    $stock          = mysqli_real_escape_string($conn, $_POST['stock']);
-    $status         = mysqli_real_escape_string($conn, $_POST['status']);
+    $pro_id        = mt_rand(11111, 99999);
+    $pro_name      = mysqli_real_escape_string($conn, $_POST['pro_name']);$brand_name    = mysqli_real_escape_string($conn,$_POST['brand_name']);
+    $pro_cate      = mysqli_real_escape_string($conn, $_POST['pro_cate']);$pro_sub_cate  = '0';
+    $short_desc    = mysqli_real_escape_string($conn, $_POST['short_desc']);$description   = mysqli_real_escape_string($conn,$_POST['pro_desc']);
+    $gender        = mysqli_real_escape_string($conn, $_POST['gender'] ?? 'Male / Female');$age           = mysqli_real_escape_string($conn,$_POST['age'] ?? '8 Weeks');
+    $size          = mysqli_real_escape_string($conn, $_POST['size'] ?? 'Medium to Large');$temper        = mysqli_real_escape_string($conn,$_POST['temper'] ?? 'Friendly, playful, loyal');
+    $new_arrival   = '0';$trending      = '0';
+    $mrp           = '0';$selling_price = '0';
+    $stock         = mysqli_real_escape_string($conn, $_POST['stock']);$status        = mysqli_real_escape_string($conn,$_POST['status']);
 
-    // Ensure the folder exists and is writable
     $folder = 'assets/img/uploads/';
-    if (!is_dir($folder)) {
-        mkdir($folder, 0755, true);
+    if (!is_dir($folder)) { mkdir($folder, 0755, true); }
+
+    $filename = '';
+    if (isset($_FILES['pro_img']['name'][0]) && !empty($_FILES['pro_img']['name'][0])) {
+        $filename =$_FILES['pro_img']['name'][0];
+        $tempname =$_FILES['pro_img']['tmp_name'][0];
+        move_uploaded_file($tempname, $folder .$filename);
     }
 
-    // Loop through each uploaded file
-    foreach ($_FILES['pro_img']['tmp_name'] as $key => $tempname) {
-        // Get the original file name for the current image
-        $filename = $_FILES['pro_img']['name'][$key];
-        $destination = $folder . $filename;
-
-        // Move the uploaded file to the target directory
-        if (move_uploaded_file($tempname, $destination)) {
-            echo "Image uploaded successfully: " . $filename . "<br>";
-        } else {
-            echo "Failed to upload image: " . $filename . "<br>";
-        }
-    }
-
-    $meta_title = mysqli_real_escape_string($conn, $_POST['meta_title']);
-    $meta_key = mysqli_real_escape_string($conn, $_POST["meta_key"]);
-    $meta_desc = mysqli_real_escape_string($conn, $_POST["meta_desc"]);
-
-    // --- Naya Schema variable fetch kiya ---
+    $meta_title    = mysqli_real_escape_string($conn, $_POST['meta_title']);$meta_key      = mysqli_real_escape_string($conn,$_POST["meta_key"]);
+    $meta_desc     = mysqli_real_escape_string($conn,$_POST["meta_desc"]);
     $schema_markup = mysqli_real_escape_string($conn, trim($_POST['schema_markup']));
-    $added_on = date('M d, Y');
-    $slug_url = strtolower(str_replace(" ", "-", $pro_name));
-    // $slug_url = SlugUrl($pro_name); 
-    // Assuming this function generates a valid slug
+    $added_on      = date('M d, Y');$slug_url      = mysqli_real_escape_string($conn,$_POST['slug_url']);
 
-    // Corrected SQL query (Schema column and value added)
-    $sql = "INSERT INTO `products`(`pro_id`, `pro_name`,`brand_name` , `pro_cate`, `pro_sub_cate`, `short_desc`, `description`, `new_arrival`,`trending`, `qty`, `mrp`, `selling_price`, `whole_sale_selling_price`, `stock`, `pro_img`, `status`, `slug_url`, `meta_title`, `meta_desc`, `meta_key`, `schema_markup`, `added_on`) 
-VALUES ('$pro_id', '$pro_name', '$brand_name','$pro_cate', '$pro_sub_cate', '$short_description', '$description', '$new_arrival', '$trending', '$qty','$mrp', '$selling_price', '$whole_sale_selling_price', '$stock', '$filename', '$status', '$slug_url', '$meta_title', '$meta_desc', '$meta_key', '$schema_markup', '$added_on')";
+    $sql = "INSERT INTO `products` (`pro_id`, `pro_name`, `brand_name`, `pro_cate`, `pro_sub_cate`, `short_desc`, `description`, `gender`, `age`, `size`, `temper`, `new_arrival`, `trending`, `mrp`, `selling_price`, `stock`, `pro_img`, `status`, `slug_url`, `meta_title`, `meta_desc`, `meta_key`, `schema_markup`, `added_on`) 
+            VALUES ('$pro_id', '$pro_name', '$brand_name', '$pro_cate', '$pro_sub_cate', '$short_desc', '$description', '$gender', '$age', '$size', '$temper', '$new_arrival', '$trending', '$mrp', '$selling_price', '$stock', '$filename', '$status', '$slug_url', '$meta_title', '$meta_desc', '$meta_key', '$schema_markup', '$added_on')";
 
-    // Execute the query
-    $check = mysqli_query($conn, $sql);
+    $check = mysqli_query($conn,$sql);
+    
     if ($check) {
-    ?>
-        <script type="text/javascript">
-            alert('Inserted Successfully!');
-            window.location.href = "add-products.php";
-        </script>
-    <?php
+        $last_db_id = mysqli_insert_id($conn);
+        
+        // Handle Multi-Angle Gallery Images Upload
+        if (isset($_FILES['gallery_images']['name']) && !empty($_FILES['gallery_images']['name'][0])) {
+            foreach ($_FILES['gallery_images']['tmp_name'] as$gk => $g_tmp) {$g_name = $_FILES['gallery_images']['name'][$gk];
+                if (!empty($g_name)) {
+                    move_uploaded_file($g_tmp, $folder .$g_name);
+                    mysqli_query($conn, "INSERT INTO `product_images` (`product_id`, `image_path`) VALUES ('$last_db_id', '$g_name')");
+                }
+            }
+        }
+        echo "<script>alert('Breed Added Successfully!'); window.location.href = 'show-products.php';</script>";
     } else {
-        echo "Error: " . mysqli_error($conn);  // Optional: Display any error message from MySQL
+        echo "Error: " . mysqli_error($conn);
     }
 }
-
 
 function get_Sub_Category()
 {
