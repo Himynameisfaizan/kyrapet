@@ -36,6 +36,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 <li><a href="manage-meta.php"> Manage Meta</a></li>
                 <li><a href="manage-schema.php"> Manage Schema</a></li>
                  <li><a href="add_contact.php"><span>Contact Details</span>
+                <li><a href="view-testimonials.php">View Testimonials</a></li>
             </a>
         </li>
             </ul>
