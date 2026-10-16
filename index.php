@@ -16,14 +16,6 @@ $schema_q = mysqli_query($conn, "SELECT * FROM page_schemas WHERE page_url='inde
 $schema_data = mysqli_fetch_assoc($schema_q);
 
 // ==========================================
-// 2. FETCHING ALL SECTIONS DATA (RENAMED VARIABLES FOR FALLBACK)
-// ==========================================
-
-// Hero Section
-$hero_q = mysqli_query($conn, "SELECT * FROM hero_section LIMIT 1");
-$hero = mysqli_fetch_assoc($hero_q);
-
-// ==========================================
 // Happy Customers Section Fetch
 // ==========================================
 $db_happy_customers = [];
@@ -138,36 +130,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['website'])) {
   }
 }
 
-// Yahape header include hone ke bawajood ab hamare variables safe rahenge
 require __DIR__ . '/includes/header.php';
 ?>
 <main id="home">
   <!-- HERO (Dynamic) -->
-  <section class="hero" style="padding-bottom:0">
+ <?php
+$hero_slides = [];
+$hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
+if ($hero_q && mysqli_num_rows($hero_q) > 0) {
+    while ($h_row = mysqli_fetch_assoc($hero_q)) {
+        // Image path ko fix karna taaki admin/ prefix sahi se jude
+        $b_path = $h_row['banner_path'];
+        if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
+            $b_path = 'admin/' . ltrim($b_path, '/');
+        }
+        
+        $hero_slides[] = [
+            'title' => $h_row['title'],
+            'description' => $h_row['description'],
+            'image_url' => $b_path,
+            'link_url' => !empty($h_row['link_url']) ? $h_row['link_url'] : '#breeds'
+        ];
+    }
+}
+
+// Fallback agar banners table khali ho
+if (empty($hero_slides)) {
+    $hero_slides[] = [
+        'title' => 'Bring home a healthy puppy you can trust.',
+        'description' => 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.',
+        'image_url' => 'admin/assets/img/uploads/golden.png',
+        'link_url' => '#breeds'
+    ];
+}
+?>
+
+<section class="hero" style="padding-bottom:0; position:relative; overflow:hidden;">
     <div class="blob b1"></div>
-    <div class="blob b2"></div><?php for ($k = 0; $k < 9; $k++): ?><span class="paw" style="left:<?= ($k * 11 + 5) % 96 ?>%;animation-delay:<?= $k * 1.4 ?>s;font-size:<?= 16 + ($k % 3) * 8 ?>px">🐾</span><?php endfor; ?><div class="wrap">
-      <div>
-        <div class="chip seq"><?= gicon(18) ?> <span><b><?= h($rating['score'] ?? '4.9') ?></b> rated on Google by <?= h($rating['count'] ?? '15+') ?>+ pet parents</span></div>
+    <div class="blob b2"></div>
+    <?php for ($k = 0; $k < 9; $k++): ?>
+        <span class="paw" style="left:<?= ($k * 11 + 5) % 96 ?>%;animation-delay:<?= $k * 1.4 ?>s;font-size:<?= 16 + ($k % 3) * 8 ?>px">🐾</span>
+    <?php endfor; ?>
 
-        <h1 class="split"><?= htmlspecialchars($hero['title'] ?? 'Bring home a healthy puppy you can trust.') ?></h1>
-        <p class="lead seq"><?= htmlspecialchars($hero['description'] ?? 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.') ?></p>
+    <div class="wrap">
+        <?php foreach ($hero_slides as $index => $hero): ?>
+            <div class="hero-slide-pane" style="display: <?= $index === 0 ? 'contents' : 'none' ?>;" data-slide-index="<?= $index ?>">
+                <div>
+                    <div class="chip seq"><?= gicon(18) ?> <span><b><?= h($rating['score'] ?? '4.9') ?></b> rated on Google by <?= h($rating['count'] ?? '15+') ?>+ pet parents</span></div>
 
-        <div class="cta seq"><a class="btn btn-teal" href="<?= htmlspecialchars($hero['button_link'] ?? '#breeds') ?>"><?= htmlspecialchars($hero['button_text'] ?? 'See available puppies') ?></a><a class="btn btn-line" href="#videos">Watch customer stories</a></div>
-        <div class="mini-proof seq">
-          <div class="faces">
-            <?php foreach ([$P['grass'] ?? '', $P['tan'] ?? '', $P['tongue'] ?? '', $P['sweater'] ?? ''] as $f): if ($f): ?><img src="<?= ph($f, 100) ?>" alt=""><?php endif;
-            endforeach; ?>
+                    <h1 class="split"><?= htmlspecialchars($hero['title']) ?></h1>
+                    <p class="lead seq"><?= htmlspecialchars($hero['description']) ?></p>
+
+                    <div class="cta seq">
+                        <a class="btn btn-teal" href="<?= htmlspecialchars($hero['link_url']) ?>">See available puppies</a>
+                        <a class="btn btn-line" href="#videos">Watch customer stories</a>
+                    </div>
+
+                    <div class="mini-proof seq">
+                      <div class="faces">
+                        <?php foreach ([$P['grass'] ?? '', $P['tan'] ?? '', $P['tongue'] ?? '', $P['sweater'] ?? ''] as $f): if ($f): ?>
+                            <img src="<?= ph($f, 100) ?>" alt="">
+                        <?php endif; endforeach; ?>
+                      </div>
+                      <div><span class="stars">★★★★★</span><small>Trusted by 420+ happy clients</small></div>
+                    </div>
+                </div>
+
+                <div class="hero-img">
+                    <div class="arch">
+                        <img src="<?= htmlspecialchars($hero['image_url']) ?>" alt="Kyra Pet Shop Hero" <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                    </div>
+                    <div class="fb b"><i>🩺</i><span>Vet checked<small>Health records shared</small></span></div>
+                    <div class="fb a"><i>💉</i><span>100% vaccinated<small>Card given at pickup</small></span></div>
+                </div>
             </div>
-          <div><span class="stars">★★★★★</span><small>Trusted by 420+ happy clients</small></div>
-        </div>
-      </div>
-      <div class="hero-img">
-        <div class="arch"><img src="admin/<?= ph($hero['image_url'] ?? $P['golden'] ?? '', 1000) ?>" alt="Kyra Pet Shop Hero" fetchpriority="high"></div>
-        <div class="fb b"><i>🩺</i><span>Vet checked<small>Health records shared</small></span></div>
-        <div class="fb a"><i>💉</i><span>100% vaccinated<small>Card given at pickup</small></span></div>
-      </div>
+        <?php endforeach; ?>
     </div>
-  </section>
+
+    <?php if (count($hero_slides) > 1): ?>
+    <div class="hero-dots" style="text-align: center; padding: 12px 0 0; position: relative; z-index: 10;">
+        <?php foreach ($hero_slides as $index => $slide): ?>
+            <span class="h-dot <?= $index === 0 ? 'active' : '' ?>" data-slide="<?= $index ?>" style="display: inline-block; width: 12px; height: 12px; margin: 0 5px; background: <?= $index === 0 ? 'var(--teal, #0d9488)' : '#cbd5e1' ?>; border-radius: 50%; cursor: pointer; transition: background 0.3s;"></span>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const panes = document.querySelectorAll('.hero-slide-pane');
+    const dots = document.querySelectorAll('.h-dot');
+    if (panes.length <= 1) return;
+
+    let currentSlide = 0;
+    function showSlide(index) {
+        panes.forEach((pane, idx) => {
+            pane.style.display = (idx === index) ? 'contents' : 'none';
+        });
+        dots.forEach((dot, idx) => {
+            dot.style.background = (idx === index) ? 'var(--teal, #0d9488)' : '#cbd5e1';
+        });
+        currentSlide = index;
+    }
+
+    let slideInterval = setInterval(() => {
+        let next = (currentSlide + 1) % panes.length;
+        showSlide(next);
+    }, 5000);
+
+    dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+            clearInterval(slideInterval);
+            showSlide(idx);
+        });
+    });
+});
+</script>
 
   <!-- MARQUEE -->
   <div class="marq">

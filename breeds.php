@@ -33,7 +33,8 @@ $limit = 12;
 $current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($current_page - 1) * $limit;
 
-$where = ["status=1", "pro_cate=34158"];
+// Fixed: Purani hardcoded pro_cate=34158 hata di hai taaki saari categories ke products show ho sakein
+$where = ["status=1"];
 
 // Search Box Filter
 if (!empty($_GET['search'])) {

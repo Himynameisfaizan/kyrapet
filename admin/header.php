@@ -36,7 +36,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 <li><a href="manage-meta.php"> Manage Meta</a></li>
                 <li><a href="manage-schema.php"> Manage Schema</a></li>
                 <li><a href="add_contact.php"><span>Contact Details</span>
-                <li><a href="view-testimonials.php">View Reviews</a></li>
+                <li><a href="view-testimonials.php">Google Reviews</a></li>
                 <li><a href="manage-happy-customers.php">Happy Photos</a></li>
                 <li><a href="manage-videos.php">Video Reviews</a></li>
                 </a>
@@ -73,13 +73,13 @@ if (!isset($_SESSION['admin_logged_in'])) {
         </ul>
     </li>
 
-    <li>
+    <!-- <li>
         <a class="has-arrow" href="#"><i class="fas fa-fire" style="color: #ff6b6b;"></i><span>Service</span></a>
         <ul>
             <li><a href="add-service.php">Add Service</a></li>
             <li><a href="view-service.php">View Service</a></li>
         </ul>
-    </li>
+    </li> -->
 
     <li>
         <a class="has-arrow" href="#"><i class="fas fa-blog" style="color: #9b59b6;"></i><span>Blogs</span></a>
