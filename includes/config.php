@@ -5,7 +5,7 @@
 $site = [
   'name'=>'Kyra Pet Shop','phone'=>'+91 9582799502','wa'=>'919582799502',
   'email'=>'kyrapetshop12@gmail.com','addr'=>'WZ-23 Khampur Patel Nagar, New Delhi - 110008',
-  'hours'=>'Tuesday - Sunday, 11 AM to 8 PM','owner'=>'Mr. Nitin',
+  'hours'=>'Tuesday - Sunday, 9 AM to 10 PM','owner'=>'Mr. Nitin',
   // Paste your real Google Business links here
   'g_profile'=>'https://www.google.com/maps/search/?api=1&query=Kyra+Pet+Shop+Patel+Nagar+New+Delhi',
   'g_write'  =>'https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID',

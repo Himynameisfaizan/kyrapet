@@ -1,9 +1,23 @@
 <?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include "db-conn.php";
+
+// Helper function to extract 11-character YouTube Video Code from any URL/Shorts link
+if (!function_exists('extractBreedYoutubeId')) {
+    function extractBreedYoutubeId($url) {
+        $url = trim($url ?? '');
+        if (preg_match('/^[a-zA-Z0-9_-]{11}$/',$url)) {
+            return $url;
+        }
+        $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/';
+        if (preg_match($pattern, $url,$matches)) {
+            return $matches[1];
+        }
+        return '';
+    }
+}
 
 if (isset($_POST["add-categories"])) {
     $fileName = '';
@@ -72,8 +86,7 @@ function get_Category()
     include "db-conn.php";
 
     $sql = "SELECT * FROM `categories` ORDER BY id DESC";
-    $check = mysqli_query($conn, $sql);
-    $sno = 1;
+    $check = mysqli_query($conn, $sql);$sno = 1;
     while ($result = mysqli_fetch_assoc($check)) {
         echo $output = "<tr>
         <td>" . $sno++ . "</td>
@@ -122,7 +135,7 @@ if (isset($_POST["add-product"])) {
     if ($check) {
         $last_db_id = mysqli_insert_id($conn);
         
-        // Handle Multi-Angle Gallery Images Upload
+        // 1. Handle Multi-Angle Gallery Images Upload
         if (isset($_FILES['gallery_images']['name']) && !empty($_FILES['gallery_images']['name'][0])) {
             foreach ($_FILES['gallery_images']['tmp_name'] as$gk => $g_tmp) {$g_name = $_FILES['gallery_images']['name'][$gk];
                 if (!empty($g_name)) {
@@ -131,6 +144,32 @@ if (isset($_POST["add-product"])) {
                 }
             }
         }
+
+        // 2. Handle Breed-Specific Video Reviews
+        mysqli_query($conn, "CREATE TABLE IF NOT EXISTS `product_videos` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `product_id` int(11) NOT NULL,
+          `video_title` varchar(255) NOT NULL,
+          `youtube_url` varchar(255) NOT NULL,
+          `video_code` varchar(50) NOT NULL,
+          `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+          PRIMARY KEY (`id`),
+          KEY `product_id` (`product_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        if (!empty($_POST['video_urls']) && is_array($_POST['video_urls'])) {
+            foreach ($_POST['video_urls'] as$vk => $v_url) {$v_url = trim($v_url);$v_title = trim($_POST['video_titles'][$vk] ?? '');
+                if ($v_url !== '') {
+                    $v_code = extractBreedYoutubeId($v_url);
+                    if ($v_code !== '') {
+                        if ($v_title === '')$v_title = $pro_name . ' Customer Review';$v_title_esc = mysqli_real_escape_string($conn,$v_title);
+                        $v_url_esc   = mysqli_real_escape_string($conn, $v_url);$v_code_esc  = mysqli_real_escape_string($conn,$v_code);
+                        mysqli_query($conn, "INSERT INTO `product_videos` (`product_id`, `video_title`, `youtube_url`, `video_code`) VALUES ('$last_db_id', '$v_title_esc', '$v_url_esc', '$v_code_esc')");
+                    }
+                }
+            }
+        }
+
         echo "<script>alert('Breed Added Successfully!'); window.location.href = 'show-products.php';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
@@ -143,29 +182,21 @@ function get_Sub_Category()
 
     $searchQuery = "";
     if (isset($_GET['search']) && !empty($_GET['search'])) {
-        $search = mysqli_real_escape_string($conn, $_GET['search']);
-        $searchQuery = " WHERE `categories` LIKE '%$search%' OR `slug_url` LIKE '%$search%' ";
+        $search = mysqli_real_escape_string($conn, $_GET['search']);$searchQuery = " WHERE `categories` LIKE '%$search%' OR `slug_url` LIKE '%$search%' ";
     }
 
     $sql = "SELECT * FROM `sub_categories` $searchQuery ORDER BY id DESC";
-    $check = mysqli_query($conn, $sql);
-    $sno = 1;
+    $check = mysqli_query($conn, $sql);$sno = 1;
 
     if ($check && mysqli_num_rows($check) > 0) {
-        while ($result = mysqli_fetch_assoc($check)) {
-            $parent_id = $result['parent_id'];
-
-            // Fetch parent category
-            $sql2 = "SELECT `categories` FROM `categories` WHERE `cate_id` = $parent_id";
-            $check2 = mysqli_query($conn, $sql2);
-            $parent_cate = ""; // Default empty if not found
+        while ($result = mysqli_fetch_assoc($check)) {$parent_id = $result['parent_id'];$sql2 = "SELECT `categories` FROM `categories` WHERE `cate_id` = $parent_id";
+            $check2 = mysqli_query($conn, $sql2);$parent_cate = "";
 
             if ($check2 && mysqli_num_rows($check2) > 0) {
                 $parent = mysqli_fetch_assoc($check2);
-                $parent_cate = $parent['categories'];
+                $parent_cate =$parent['categories'];
             }
 
-            // Output row
             echo "<tr>
                     <td>" . $sno++ . "</td>
                     <td>" . htmlspecialchars($result['cate_id']) . "</td>
@@ -187,12 +218,8 @@ function get_Sub_Category()
     }
 }
 
-
-
-if (isset($_POST['cate_id'])) {
-    $p_id = $_POST['cate_id'];
-    $sql = "SELECT * FROM `sub_categories` where `parent_id` = '$p_id' ORDER BY id DESC";
-    $check = mysqli_query($conn, $sql);
+if (isset($_POST['cate_id'])) {$p_id = $_POST['cate_id'];$sql = "SELECT * FROM `sub_categories` where `parent_id` = '$p_id' ORDER BY id DESC";
+    $check = mysqli_query($conn,$sql);
     ?>
     <option value="">Select</option>
 <?php
@@ -203,35 +230,25 @@ if (isset($_POST['cate_id'])) {
 
 function SlugUrl($string)
 {
-    $slug = preg_replace('/[^a-zA-Z0-9 -]/', '', $string);
-    $slug = str_replace('', '-', $slug);
+    $slug = preg_replace('/[^a-zA-Z0-9 -]/', '',$string);
+    $slug = str_replace('', '-',$slug);
     $slug = strtolower($slug);
     return ($slug);
 }
 
-
-
-// Get a single category by ID
 function get_category_by_id($cat_id)
 {
     global $conn;
-    $cat_id = mysqli_real_escape_string($conn, $cat_id);
-    $sql = "SELECT * FROM `categories` WHERE cate_id = '$cat_id' LIMIT 1";
-    $result = mysqli_query($conn, $sql);
+    $cat_id = mysqli_real_escape_string($conn, $cat_id);$sql = "SELECT * FROM `categories` WHERE cate_id = '$cat_id' LIMIT 1";
+    $result = mysqli_query($conn,$sql);
     return mysqli_fetch_assoc($result);
 }
-
-// Update a category
-
-
 
 function get_sub_category_by_id($cat_id)
 {
     global $conn;
-    $cat_id = mysqli_real_escape_string($conn, $cat_id);
-    $sql = "SELECT * FROM `sub_categories` WHERE cate_id = '$cat_id' LIMIT 1";
-    $result = mysqli_query($conn, $sql);
+    $cat_id = mysqli_real_escape_string($conn, $cat_id);$sql = "SELECT * FROM `sub_categories` WHERE cate_id = '$cat_id' LIMIT 1";
+    $result = mysqli_query($conn,$sql);
     return mysqli_fetch_assoc($result);
 }
-
 ?>

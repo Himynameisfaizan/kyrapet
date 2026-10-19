@@ -27,6 +27,7 @@ if ($slug !== '') {
 
         $dog = [
             'n'             => (int)$row['id'],
+            'pro_cate'      => (int)($row['pro_cate'] ?? 0),
             'slug'          => $row['slug_url'],
             'name'          => $row['pro_name'],
             'breed'         => !empty($row['brand_name']) ? $row['brand_name'] : $row['pro_name'],
@@ -75,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && e
     $r_text  = trim(strip_tags($_POST['review_text'] ?? ''));
 
     if ($r_name !== '' && $r_text !== '' && $product_id > 0) {
-        // status = 1 rakha hai taaki review turant page par dikhe (Agar admin approval chahiye toh 1 ki jagah 0 kar dena)
         $status_val = 1;
         $stmt = $conn->prepare("INSERT INTO product_reviews (product_id, reviewer_name, reviewer_email, rating, review_text, status) VALUES (?, ?, ?, ?, ?, ?)");
         if ($stmt) {
@@ -103,7 +103,6 @@ if ($product_id > 0) {
         while ($img_row = mysqli_fetch_assoc($img_q)) {
             $p_img = trim($img_row['image_path']);
             if ($p_img !== '') {
-                // Check if full relative path is saved or just filename
                 if (strpos($p_img, 'admin/') === 0 || strpos($p_img, 'http') === 0) {
                     $gallery_images[] = $p_img;
                 } elseif (strpos($p_img, 'uploads/') === 0) {
@@ -135,25 +134,40 @@ $rev_count = count($breed_reviews);
 $avg_rating = $rev_count > 0 ? round($total_rating / $rev_count, 1) : '5.0';
 
 // ==========================================
-// 5. FETCH CUSTOMER VIDEOS (FOR VIDEO SECTION)
+// 5. FETCH BREED-SPECIFIC CUSTOMER VIDEOS
 // ==========================================
 $db_v3 = [];
-$vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status=1 ORDER BY video_id DESC");
-if ($vid_q) {
-    while ($v_row = mysqli_fetch_assoc($vid_q)) {
-        if (!isset($v_row['section_type']) || $v_row['section_type'] == 'ask_them' || count($db_v3) < 3) {
-            $db_v3[] = [$v_row['video_code'], $v_row['title']];
+if ($product_id > 0) {
+    $vid_q = mysqli_query($conn, "SELECT * FROM product_videos WHERE product_id = $product_id ORDER BY id ASC");
+    if ($vid_q && mysqli_num_rows($vid_q) > 0) {
+        while ($v_row = mysqli_fetch_assoc($vid_q)) {
+            $db_v3[] = [$v_row['video_code'], $v_row['video_title']];
         }
     }
-    $db_v3 = array_slice($db_v3, 0, 3);
+}
+
+// Fallback: Agar is breed ke liye koi specific video nahi daali hai, toh general videos table se dikhayega
+if (empty($db_v3)) {
+    $vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status=1 ORDER BY video_id DESC");
+    if ($vid_q) {
+        while ($v_row = mysqli_fetch_assoc($vid_q)) {
+            if (!isset($v_row['section_type']) || $v_row['section_type'] == 'ask_them' || count($db_v3) < 3) {
+                $db_v3[] = [$v_row['video_code'], $v_row['title']];
+            }
+        }
+        $db_v3 = array_slice($db_v3, 0, 3);
+    }
 }
 
 // ==========================================
-// 6. FETCH RELATED PUPPIES ("You may also like")
+// 6. FETCH RELATED PUPPIES (FIXED + SLIDER SUPPORT)
 // ==========================================
 $db_related = [];
 $slug_esc = mysqli_real_escape_string($conn, $dog['slug']);
-$rel_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 AND pro_cate=34158 AND slug_url != '$slug_esc' ORDER BY id DESC LIMIT 4");
+$cur_cate = (int)($dog['pro_cate'] ?? 0);
+
+// Pehle same category wale breeds ko priority dega, fir baaki active breeds ko (bina 34158 restriction ke)
+$rel_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 AND slug_url != '$slug_esc' ORDER BY (pro_cate = $cur_cate) DESC, id DESC LIMIT 12");
 if ($rel_q) {
     while ($r_row = mysqli_fetch_assoc($rel_q)) {
         $db_related[] = [
@@ -183,8 +197,9 @@ $wa   = 'https://wa.me/' . ($site['wa'] ?? '') . '?text=' . rawurlencode('Hi Kyr
 require __DIR__.'/includes/header.php';
 
 // Fallbacks after header include
-$related = !empty($db_related) ? $db_related : array_slice(array_values(array_filter($dogs, fn($x) => $x['slug'] !== $dog['slug'])), 0, 4);
-$display_v3 = !empty($db_v3) ? $db_v3 : ($v3 ?? []);
+$related = !empty($db_related) ? $db_related : array_values(array_filter($dogs, fn($x) => $x['slug'] !== $dog['slug']));
+// $display_v3 = !empty($db_v3) ? $db_v3 : ($v3 ?? []);
+$display_v3 = $db_v3;
 
 if (function_exists('banner')) {
     banner($dog['name'], 'Breeds');
@@ -207,22 +222,18 @@ if (function_exists('banner')) {
   .pic-slider-box { position: relative; border-radius: 26px; overflow: hidden; background: #f1f5f9; aspect-ratio: 4 / 3.6; box-shadow: 0 18px 45px rgba(15,23,42,0.08); user-select: none; }
   .pic-slider-box img.main-dog-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; cursor: zoom-in; transform-origin: center center; }
   
-  /* Desktop Hover Zoom Effect */
   @media (hover: hover) and (pointer: fine) {
     .pic-slider-box.zoomed img.main-dog-img { transform: scale(1.85); }
   }
 
-  /* Slider Prev / Next Arrows */
   .gal-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1px solid rgba(15,23,42,0.08); color: var(--ink, #0f172a); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: all 0.25s ease; font-size: 18px; font-weight: bold; }
   .gal-nav-btn:hover { background: var(--teal, #0d9488); color: #fff; transform: translateY(-50%) scale(1.06); }
   .gal-nav-btn.prev { left: 14px; }
   .gal-nav-btn.next { right: 14px; }
 
-  /* Zoom Hint Pill */
   .zoom-pill { position: absolute; bottom: 14px; right: 14px; background: rgba(15,23,42,0.75); backdrop-filter: blur(6px); color: #fff; padding: 6px 13px; border-radius: 30px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; z-index: 5; pointer-events: none; }
   .slide-counter { position: absolute; bottom: 14px; left: 14px; background: rgba(255,255,255,0.9); color: var(--ink, #0f172a); padding: 5px 12px; border-radius: 30px; font-size: 12.5px; font-weight: 700; z-index: 5; }
 
-  /* Thumbnails Track */
   .thumb-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; scroll-behavior: smooth; }
   .thumb-strip::-webkit-scrollbar { display: none; }
   .thumb-btn { flex: 0 0 84px; height: 72px; border-radius: 14px; overflow: hidden; border: 2.5px solid transparent; padding: 0; cursor: pointer; background: #e2e8f0; transition: all 0.25s ease; opacity: 0.65; }
@@ -230,7 +241,6 @@ if (function_exists('banner')) {
   .thumb-btn:hover { opacity: 0.9; transform: translateY(-2px); }
   .thumb-btn.active { border-color: var(--teal, #0d9488); opacity: 1; box-shadow: 0 6px 16px rgba(13,148,136,0.25); }
 
-  /* Fullscreen Mobile & Desktop Zoom Modal */
   .zoom-modal { position: fixed; inset: 0; background: rgba(11,18,32,0.94); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; touch-action: pinch-zoom; }
   .zoom-modal.open { display: flex; }
   .zm-img-wrap { max-width: 92vw; max-height: 80vh; overflow: auto; display: flex; align-items: center; justify-content: center; border-radius: 16px; }
@@ -263,7 +273,6 @@ if (function_exists('banner')) {
   .th-box b { display: block; font-size: 14.5px; color: var(--ink, #0f172a); }
   .th-box small { color: var(--mute, #64748b); font-size: 13px; }
 
-  /* Review List & Star Rating Form */
   .rev-summary-bar { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 16px 20px; border-radius: 18px; margin: 16px 0 22px; border: 1px solid #e2e8f0; }
   .rev-summary-bar .score { font-size: 32px; font-weight: 800; color: var(--ink, #0f172a); line-height: 1; }
   .rev-list-scroll { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; margin-bottom: 24px; }
@@ -273,7 +282,6 @@ if (function_exists('banner')) {
   .rev-av { width: 36px; height: 36px; border-radius: 50%; background: var(--teal, #0d9488); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; }
   .rev-item-card p { margin: 6px 0 0; font-size: 14.5px; color: var(--mute, #475569); line-height: 1.55; }
 
-  /* Interactive Star Picker */
   .star-picker { display: inline-flex; flex-direction: row-reverse; gap: 4px; }
   .star-picker input { display: none; }
   .star-picker label { font-size: 26px; color: #cbd5e1; cursor: pointer; transition: color 0.2s; }
@@ -283,6 +291,66 @@ if (function_exists('banner')) {
 
   .rev-form input, .rev-form textarea { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 12px; font-family: inherit; font-size: 14.5px; margin-bottom: 12px; background: #f8fafc; }
   .rev-form input:focus, .rev-form textarea:focus { outline: none; border-color: var(--teal, #0d9488); background: #fff; }
+
+  /* =====================================================
+     RELATED BREEDS SLIDER STYLING ("You may also like")
+     ===================================================== */
+  .rel-slider-outer { position: relative; padding: 6px 0 18px; }
+  .rel-slider-track {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 4px 20px;
+  }
+  .rel-slider-track::-webkit-scrollbar { display: none; }
+  .rel-slide-item {
+    flex: 0 0 calc(25% - 18px);
+    min-width: 265px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+  }
+  .rel-slide-item > * { height: 100%; width: 100%; }
+  @media (max-width: 1080px) { .rel-slide-item { flex: 0 0 calc(33.333% - 16px); } }
+  @media (max-width: 820px)  { .rel-slide-item { flex: 0 0 calc(50% - 12px); } }
+  @media (max-width: 520px)  { .rel-slide-item { flex: 0 0 85%; min-width: 245px; } }
+
+  .rel-nav-btn {
+    position: absolute;
+    top: 44%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: var(--ink, #0f172a);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 8;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.25s ease;
+  }
+  .rel-nav-btn:hover {
+    background: var(--teal, #0d9488);
+    color: #fff;
+    border-color: var(--teal, #0d9488);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .rel-nav-btn.prev { left: -18px; }
+  .rel-nav-btn.next { right: -18px; }
+  @media (max-width: 768px) {
+    .rel-nav-btn.prev { left: 4px; }
+    .rel-nav-btn.next { right: 4px; }
+  }
 </style>
 
 <main>
@@ -454,28 +522,44 @@ if (function_exists('banner')) {
   </div>
 </div></section>
 
-<!-- YOUTUBE VIDEO REVIEWS SECTION (Same as Home Page "Ask them, not us") -->
+<?php if (!empty($display_v3)): ?>
+<!-- YOUTUBE VIDEO REVIEWS SECTION (Genuine Breed-Specific Videos) -->
 <section class="vs3"><div class="wrap">
   <div class="sec-head c">
     <span class="tag">Puppy parents speak</span>
     <h2>Ask them, not us</h2>
-    <p>Honest words from people who visited our shop and took a puppy home. Tap a video to hear them.</p>
+    <p>Honest words from families who took home a <?= h($dog['breed']) ?> from Kyra Pet Shop. Tap a video to hear them.</p>
   </div>
   <div class="pp">
-    <?php foreach ($display_v3 as $i =>$v): ?>
+    <?php foreach ($display_v3 as $i => $v): ?>
       <div class="ppc rv">
-        <?php if (function_exists('vcard')) echo vcard($v,$i); ?>
-        <div class="q"><?= stars(5) ?><b><?= h($v[1] ?? 'Happy Pet Parent') ?></b><span>Customer feedback at Kyra Pet Shop</span></div>
+        <?php if (function_exists('vcard')) echo vcard($v, $i % 3); ?>
+        <div class="q"><?= stars(5) ?><b><?= h($v[1] ?? 'Happy Pet Parent') ?></b><span>Verified <?= h($dog['breed']) ?> Parent · Kyra Pet Shop</span></div>
       </div>
     <?php endforeach; ?>
   </div>
 </div></section>
+<?php endif; ?>
 
-<!-- MORE PUPPIES SECTION -->
+<!-- MORE PUPPIES SECTION (WITH SMOOTH SLIDER) -->
 <section class="feat"><div class="wrap">
   <div class="sec-head c"><span class="tag">More puppies</span><h2>You may also like</h2></div>
-  <div class="grid4"><?php foreach($related as$d) { if(function_exists('dog_card')) dog_card($d,$site); } ?></div>
-  <div class="center"><a class="btn btn-navy" href="breeds.php">View all breeds</a></div>
+  
+  <?php if (!empty($related)): ?>
+  <div class="rel-slider-outer rv">
+    <button type="button" class="rel-nav-btn prev" id="relPrev" aria-label="Previous breeds">←</button>
+    <div class="rel-slider-track" id="relSliderTrack">
+      <?php foreach ($related as $d): ?>
+        <div class="rel-slide-item">
+          <?php if (function_exists('dog_card')) dog_card($d, $site); ?>
+        </div>
+      <?php endforeach; ?>
+    </div>
+    <button type="button" class="rel-nav-btn next" id="relNext" aria-label="Next breeds">→</button>
+  </div>
+  <?php endif; ?>
+
+  <div class="center" style="margin-top:24px"><a class="btn btn-navy" href="breeds.php">View all breeds</a></div>
 </div></section>
 <?php if(function_exists('cta_band')) cta_band(); ?>
 </main>
@@ -495,6 +579,46 @@ if (function_exists('banner')) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // 1. Related Breeds Slider Logic
+  const relTrack = document.getElementById('relSliderTrack');
+  const relPrev  = document.getElementById('relPrev');
+  const relNext  = document.getElementById('relNext');
+  if (relTrack) {
+    let relTimer;
+    function getRelStep() {
+      const card = relTrack.querySelector('.rel-slide-item');
+      return card ? card.offsetWidth + 24 : 300;
+    }
+    function slideRelNext() {
+      if (relTrack.scrollLeft + relTrack.clientWidth >= relTrack.scrollWidth - 10) {
+        relTrack.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        relTrack.scrollBy({ left: getRelStep(), behavior: 'smooth' });
+      }
+    }
+    function slideRelPrev() {
+      if (relTrack.scrollLeft <= 0) {
+        relTrack.scrollTo({ left: relTrack.scrollWidth, behavior: 'smooth' });
+      } else {
+        relTrack.scrollBy({ left: -getRelStep(), behavior: 'smooth' });
+      }
+    }
+    if (relNext) relNext.addEventListener('click', slideRelNext);
+    if (relPrev) relPrev.addEventListener('click', slideRelPrev);
+
+    function startRelAuto() { relTimer = setInterval(slideRelNext, 3500); }
+    function stopRelAuto()  { clearInterval(relTimer); }
+
+    relTrack.addEventListener('mouseenter', stopRelAuto);
+    relTrack.addEventListener('mouseleave', startRelAuto);
+    relTrack.addEventListener('touchstart', stopRelAuto, {passive: true});
+    relTrack.addEventListener('touchend', startRelAuto, {passive: true});
+    if (relNext) relNext.addEventListener('mouseenter', stopRelAuto);
+    if (relPrev) relPrev.addEventListener('mouseenter', stopRelAuto);
+    startRelAuto();
+  }
+
+  // 2. Main Gallery & Zoom Logic
   const images = <?= json_encode($gallery_images) ?>;
   if (!images || images.length === 0) return;
 
@@ -506,7 +630,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const counterEl    = document.getElementById('slideCounter');
   const thumbs       = document.querySelectorAll('.thumb-btn');
 
-  // Zoom Modal Elements
   const zoomModal    = document.getElementById('zoomModal');
   const zmImg        = document.getElementById('zmImg');
   const zmClose      = document.getElementById('zmClose');
@@ -542,7 +665,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Mobile Touch Swipe Support on Main Image
   let touchStartX = 0;
   let touchEndX = 0;
   if (sliderBox) {
@@ -556,7 +678,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (touchEndX - touchStartX > 45) updateSlide(currentIndex - 1);
     }, {passive: true});
 
-    // Desktop Hover Lens Zoom
     sliderBox.addEventListener('mousemove', function(e) {
       if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
         this.classList.add('zoomed');
@@ -572,7 +693,6 @@ document.addEventListener('DOMContentLoaded', function() {
       mainImg.style.transformOrigin = 'center center';
     });
 
-    // Click / Tap to Open Fullscreen Zoom Modal (Great for Mobile & Desktop)
     mainImg.addEventListener('click', function() {
       zmImg.src = images[currentIndex];
       zmImg.classList.remove('deep-zoom');
@@ -580,7 +700,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Modal Controls
   if (zmClose) zmClose.addEventListener('click', () => zoomModal.classList.remove('open'));
   if (zmToggle) zmToggle.addEventListener('click', () => zmImg.classList.toggle('deep-zoom'));
   if (zmImg) zmImg.addEventListener('click', () => zmImg.classList.toggle('deep-zoom'));

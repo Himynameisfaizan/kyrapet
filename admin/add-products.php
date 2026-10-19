@@ -81,12 +81,11 @@ $check = mysqli_query($conn,$sql);
                                                                 </select>
                                                             </div>
 
-                                                            <!-- Sub Category -->
                                                             <div class="col-md-6 mb-3" style="display:none;">
                                                                 <input type="hidden" name="pro_sub_cate" value="0">
                                                             </div>
 
-                                                            <!-- NEW SPECS FIELDS: Gender, Age, Size, Temperament -->
+                                                            <!-- SPECS FIELDS: Gender, Age, Size, Temperament -->
                                                             <div class="col-md-3 mb-3">
                                                                 <label class="form-label" for="gender">Gender</label>
                                                                 <input type="text" class="form-control" name="gender" id="gender" value="Male / Female" placeholder="e.g. Male" required />
@@ -122,13 +121,36 @@ $check = mysqli_query($conn,$sql);
                                                                 <input type="file" class="form-control" name="gallery_images[]" id="gallery_images" multiple />
                                                                 <small class="text-muted">Aap ek sath multiple photos select kar sakte hain jo frontend breed detail page par slider mein dikhengi.</small>
                                                             </div>
+
+                                                            <!-- NEW: BREED SPECIFIC CUSTOMER VIDEO REVIEWS -->
+                                                            <div class="col-md-12 mb-4 p-3 rounded" style="background:#f8fafc; border:1px dashed #cbd5e1;">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <div>
+                                                                        <label class="form-label fw-bold text-success mb-0">Customer Video Reviews for this Breed (YouTube / Shorts)</label>
+                                                                        <div class="small text-muted">Yahan daali gayi videos seedha is breed ke detail page par "Ask them, not us" section mein dikhengi.</div>
+                                                                    </div>
+                                                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="addVideoRow()">
+                                                                        <i class="fas fa-plus me-1"></i> Add More Video
+                                                                    </button>
+                                                                </div>
+                                                                <div id="videoRowsContainer">
+                                                                    <div class="row g-2 mb-2 video-row-item">
+                                                                        <div class="col-md-5">
+                                                                            <input type="text" class="form-control" name="video_titles[]" placeholder="Video Title / Customer Name (e.g. Happy Labrador Family)">
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" class="form-control" name="video_urls[]" placeholder="YouTube or Shorts URL (e.g. https://youtube.com/shorts/...)">
+                                                                        </div>
+                                                                        <div class="col-md-1 d-grid">
+                                                                            <button type="button" class="btn btn-outline-danger" onclick="this.closest('.video-row-item').remove()">✕</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                             
-                                                            <!-- Exclusive Deal -->
                                                             <div class="col-md-6 mb-3" style="display:none;">
                                                                 <input type="hidden" name="new_arrival" value="0">
                                                             </div>
-
-                                                            <!-- Special Offers -->
                                                             <div class="col-md-6 mb-3" style="display:none;">
                                                                 <input type="hidden" name="trending" value="0">
                                                             </div>
@@ -145,7 +167,6 @@ $check = mysqli_query($conn,$sql);
                                                                 <textarea class="form-control" name="pro_desc" required ></textarea>
                                                             </div>
 
-                                                            <!-- MRP / Price fields (kept hidden or optional for pet adoption) -->
                                                             <div class="col-md-6 mb-3" style="display:none;">
                                                                 <input type="hidden" name="mrp" value="0">
                                                             </div>
@@ -203,6 +224,24 @@ $check = mysqli_query($conn,$sql);
         <?php include "footer.php"; ?>
 
         <script>
+            function addVideoRow() {
+                const container = document.getElementById('videoRowsContainer');
+                const row = document.createElement('div');
+                row.className = 'row g-2 mb-2 video-row-item';
+                row.innerHTML = `
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" name="video_titles[]" placeholder="Video Title / Customer Name">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="video_urls[]" placeholder="YouTube or Shorts URL">
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button type="button" class="btn btn-outline-danger" onclick="this.closest('.video-row-item').remove()">✕</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+
             const form = document.getElementById('myForm');
             form.addEventListener('submit', function(event) {
                 const select = document.getElementById('pro_cate');

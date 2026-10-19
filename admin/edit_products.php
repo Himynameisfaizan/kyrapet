@@ -11,7 +11,7 @@ if (!isset($_GET['edit_product_details'])) {
 $product_id = intval($_GET['edit_product_details']);
 
 $query = "SELECT * FROM products WHERE pro_id = $product_id";
-$result = mysqli_query($conn,$query);
+$result = mysqli_query($conn, $query);
 
 if ($result && mysqli_num_rows($result) > 0) {
     $product = mysqli_fetch_assoc($result);
@@ -20,7 +20,28 @@ if ($result && mysqli_num_rows($result) > 0) {
 }
 
 $sql = "SELECT * FROM `categories` WHERE `status` = 1 ORDER BY id DESC";
-$check = mysqli_query($conn,$sql);
+$check = mysqli_query($conn, $sql);
+
+// Ensure product_videos table exists
+mysqli_query($conn, "CREATE TABLE IF NOT EXISTS `product_videos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) NOT NULL,
+  `video_title` varchar(255) NOT NULL,
+  `youtube_url` varchar(255) NOT NULL,
+  `video_code` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+$p_db_id = (int)$product['id'];
+$existing_videos = [];
+$vid_res = mysqli_query($conn, "SELECT * FROM product_videos WHERE product_id = $p_db_id ORDER BY id ASC");
+if ($vid_res && mysqli_num_rows($vid_res) > 0) {
+    while ($v_row = mysqli_fetch_assoc($vid_res)) {
+        $existing_videos[] = $v_row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +83,10 @@ $check = mysqli_query($conn,$sql);
                             <div class="white_card_body">
                                 <br />
                                 <div class="card-body">
+                                    <?php if (isset($_GET['success'])): ?>
+                                        <div class="alert alert-success">Breed details & videos updated successfully!</div>
+                                    <?php endif; ?>
+
                                     <form action="update-product.php" method="POST" enctype="multipart/form-data">
                                         
                                         <input type="hidden" name="pro_id" value="<?= $product['pro_id'] ?>" />
@@ -94,8 +119,8 @@ $check = mysqli_query($conn,$sql);
                                                 <label class="form-label" for="pro_cate">Parent Category</label>
                                                 <select class="form-control" name="pro_cate" id="pro_cate" required>
                                                     <option value="">--Select Category--</option>
-                                                    <?php foreach ($check as$val) { ?>
-                                                        <option value="<?= $val['cate_id'] ?>" <?= ($product['pro_cate'] ==$val['cate_id']) ? 'selected' : '' ?>>
+                                                    <?php foreach ($check as $val) { ?>
+                                                        <option value="<?= $val['cate_id'] ?>" <?= ($product['pro_cate'] == $val['cate_id']) ? 'selected' : '' ?>>
                                                             <?= ucwords(htmlspecialchars($val['categories'])) ?>
                                                         </option>
                                                     <?php } ?>
@@ -148,20 +173,66 @@ $check = mysqli_query($conn,$sql);
                                                 <input type="file" class="form-control" name="gallery_images[]" id="gallery_images" multiple />
                                                 <small class="text-muted">Nayi images select karne par yeh is breed ke gallery mein add ho jayengi.</small>
                                                 
-                                                <!-- Show existing multi-angle images from product_images table -->
                                                 <?php
-                                                $p_db_id = (int)$product['id'];
                                                 $g_res = mysqli_query($conn, "SELECT * FROM product_images WHERE product_id = $p_db_id");
                                                 if ($g_res && mysqli_num_rows($g_res) > 0) {
                                                     echo '<div class="d-flex flex-wrap gap-2 mt-2">';
                                                     while($g_row = mysqli_fetch_assoc($g_res)) {
-                                                        $g_path =$g_row['image_path'];
-                                                        $full_path = (strpos($g_path, 'uploads/') !== false) ? $g_path : 'assets/img/uploads/' .$g_path;
+                                                        $g_path = $g_row['image_path'];
+                                                        $full_path = (strpos($g_path, 'uploads/') !== false) ? $g_path : 'assets/img/uploads/' . $g_path;
                                                         echo '<div style="position:relative; display:inline-block;"><img src="'.$full_path.'" style="height:60px;width:60px;object-fit:cover;border-radius:6px;border:1px solid #ddd;"></div>';
                                                     }
                                                     echo '</div>';
                                                 }
                                                 ?>
+                                            </div>
+
+                                            <!-- BREED SPECIFIC CUSTOMER VIDEO REVIEWS (ADD / EDIT / DELETE) -->
+                                            <div class="col-md-12 mb-4 p-3 rounded" style="background:#f8fafc; border:1px dashed #cbd5e1;">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <div>
+                                                        <label class="form-label fw-bold text-success mb-0">Customer Video Reviews for this Breed (YouTube / Shorts)</label>
+                                                        <div class="small text-muted">Yahan se aap is breed ke video reviews add, edit ya remove (✕) kar sakte hain.</div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="addVideoRow()">
+                                                        <i class="fas fa-plus me-1"></i> Add More Video
+                                                    </button>
+                                                </div>
+
+                                                <div id="videoRowsContainer">
+                                                    <?php if (!empty($existing_videos)): ?>
+                                                        <?php foreach ($existing_videos as $ev): ?>
+                                                            <div class="row g-2 mb-2 align-items-center video-row-item">
+                                                                <div class="col-md-1 text-center">
+                                                                    <a href="https://www.youtube.com/watch?v=<?= htmlspecialchars($ev['video_code']) ?>" target="_blank" title="Watch Video">
+                                                                        <img src="https://i.ytimg.com/vi/<?= htmlspecialchars($ev['video_code']) ?>/hqdefault.jpg" style="width:60px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #ccc;" alt="Thumb">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <input type="text" class="form-control" name="video_titles[]" value="<?= htmlspecialchars($ev['video_title']) ?>" placeholder="Video Title / Customer Name">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="video_urls[]" value="<?= htmlspecialchars($ev['youtube_url']) ?>" placeholder="YouTube or Shorts URL">
+                                                                </div>
+                                                                <div class="col-md-1 d-grid">
+                                                                    <button type="button" class="btn btn-outline-danger" title="Remove Video" onclick="this.closest('.video-row-item').remove()">✕</button>
+                                                                </div>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    <?php else: ?>
+                                                        <div class="row g-2 mb-2 align-items-center video-row-item">
+                                                            <div class="col-md-5">
+                                                                <input type="text" class="form-control" name="video_titles[]" placeholder="Video Title / Customer Name (e.g. Happy Family)">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <input type="text" class="form-control" name="video_urls[]" placeholder="YouTube or Shorts URL (e.g. https://youtube.com/shorts/...)">
+                                                            </div>
+                                                            <div class="col-md-1 d-grid">
+                                                                <button type="button" class="btn btn-outline-danger" onclick="this.closest('.video-row-item').remove()">✕</button>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
 
                                             <!-- Short Description -->
@@ -222,6 +293,24 @@ $check = mysqli_query($conn,$sql);
         <?php include "footer.php"; ?>
         <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
         <script>
+            function addVideoRow() {
+                const container = document.getElementById('videoRowsContainer');
+                const row = document.createElement('div');
+                row.className = 'row g-2 mb-2 align-items-center video-row-item';
+                row.innerHTML = `
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" name="video_titles[]" placeholder="Video Title / Customer Name">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="video_urls[]" placeholder="YouTube or Shorts URL">
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button type="button" class="btn btn-outline-danger" onclick="this.closest('.video-row-item').remove()">✕</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+
             if (document.getElementById('pro_desc')) { CKEDITOR.replace('pro_desc'); }
             if (document.getElementById('short_desc')) { CKEDITOR.replace('short_desc'); }
         </script>
