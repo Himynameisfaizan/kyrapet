@@ -32,7 +32,7 @@ $about = mysqli_fetch_assoc($about_q);
 
 // Dog Products
 $db_dogs = [];
-$prod_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 ORDER BY id DESC LIMIT 4");
+$prod_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 ORDER BY id DESC LIMIT 8");
 if ($prod_q) {
   while ($row = mysqli_fetch_assoc($prod_q)) {
     $db_dogs[] = [
@@ -51,7 +51,7 @@ if ($prod_q) {
 $db_v1 = [];
 $db_v2 = [];
 $db_v3 = [];
-$vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status = 1 limit 6");
+$vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status = 1 limit 15");
 if ($vid_q) {
   while ($row = mysqli_fetch_assoc($vid_q)) {
     if (isset($row['section_type'])) {
@@ -133,13 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['website'])) {
 require __DIR__ . '/includes/header.php';
 ?>
 <main id="home">
-  <!-- HERO (Dynamic) -->
  <?php
 $hero_slides = [];
 $hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
 if ($hero_q && mysqli_num_rows($hero_q) > 0) {
     while ($h_row = mysqli_fetch_assoc($hero_q)) {
-        // Image path ko fix karna taaki admin/ prefix sahi se jude
         $b_path = $h_row['banner_path'];
         if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
             $b_path = 'admin/' . ltrim($b_path, '/');
