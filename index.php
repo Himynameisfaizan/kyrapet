@@ -16,13 +16,34 @@ $schema_q = mysqli_query($conn, "SELECT * FROM page_schemas WHERE page_url='inde
 $schema_data = mysqli_fetch_assoc($schema_q);
 
 // ==========================================
-// Happy Customers Section Fetch
+// 2. VIDEO SECTION LIMITS (Yahan se aap limit manage kar sakte hain)
 // ==========================================
+$limit_forever_homes    = 6; // "Where our puppies go next" mein kitni videos dikhani hain
+$limit_customer_stories = 3; // "Customer stories (Real families...)" mein kitni videos dikhani hain
+$limit_ask_them         = 3; // "Ask them, not us" mein kitni videos dikhani hain
+
+function getCleanYoutubeCode($code, $url = '') {
+    $code = trim($code ?? '');
+    if ($code !== '' && strlen($code) === 11) return $code;
+    $check = trim($url ?: $code);
+    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $check, $m)) {
+        return $m[1];
+    }
+    return $code;
+}
+?>
+<?php
+// ==========================================
+// 3. FETCHING ALL SECTIONS DATA FROM DATABASE
+// ==========================================
+
+// Happy Customers Section Fetch
 $db_happy_customers = [];
-$hc_q = mysqli_query($conn, "SELECT * FROM happy_customers WHERE status=1 ORDER BY id DESC LIMIT 10");
+$hc_q = mysqli_query($conn, "SELECT * FROM happy_customers WHERE status=1 ORDER BY id DESC LIMIT 15");
 if ($hc_q) {
     while ($row = mysqli_fetch_assoc($hc_q)) {
-      $db_happy_customers[] = 'admin/' . $row['image_path'];
+        $hc_path = ltrim($row['image_path'], '/');
+        $db_happy_customers[] = (strpos($hc_path, 'admin/') === 0 || strpos($hc_path, 'http') === 0) ? $hc_path : 'admin/' . $hc_path;
     }
 }
 
@@ -39,35 +60,80 @@ if ($prod_q) {
       'slug'   => $row['slug_url'],
       'name'   => $row['pro_name'],
       'breed'  => $row['brand_name'] ?? 'Dog',
-      'gender' => 'Male/Female',
-      'age'    => '8 Weeks',
+      'gender' => !empty($row['gender']) ? $row['gender'] : 'Male/Female',
+      'age'    => !empty($row['age']) ? $row['age'] : '8 Weeks',
       'img'    => !empty($row['pro_img']) ? 'admin/assets/img/uploads/' . $row['pro_img'] : null,
       'n'      => $row['id']
     ];
   }
 }
 
-// Videos (Mapped specifically for vcard function)
-$db_v1 = [];
-$db_v2 = [];
-$db_v3 = [];
-$vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status = 1 limit 15");
+// Dynamic Videos Fetching with Smart Auto-Fill & Custom Limits
+$db_v1 = []; // customer_stories
+$db_v2 = []; // forever_homes
+$db_v3 = []; // ask_them
+$all_db_videos = [];
+
+$vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status = 1 ORDER BY video_id DESC");
 if ($vid_q) {
   while ($row = mysqli_fetch_assoc($vid_q)) {
-    if (isset($row['section_type'])) {
-      $vid_item = [$row['video_code'], $row['title']];
-      if ($row['section_type'] == 'customer_stories') $db_v1[] = $vid_item;
-      elseif ($row['section_type'] == 'forever_homes') $db_v2[] = $vid_item;
-      elseif ($row['section_type'] == 'ask_them') $db_v3[] = $vid_item;
+    $v_code = trim($row['video_code'] ?? '');
+    if ($v_code === '' && !empty($row['youtube_url'])) {
+      if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $row['youtube_url'], $m)) {
+        $v_code = $m[1];
+      }
+    }
+    if ($v_code === '') continue;
+
+    $vid_item = [$v_code, !empty($row['title']) ? $row['title'] : 'Happy Pet Parent'];
+    $all_db_videos[] = $vid_item;
+
+    $sec_type = trim($row['section_type'] ?? '');
+    if ($sec_type === 'customer_stories') {
+      $db_v1[] = $vid_item;
+    } elseif ($sec_type === 'forever_homes') {
+      $db_v2[] = $vid_item;
+    } elseif ($sec_type === 'ask_them') {
+      $db_v3[] = $vid_item;
     }
   }
 }
+
+// Smart Auto-Fill: Agar kisi section mein limit se kam videos tagged hain, toh DB ki baaki videos se pura karein
+if (!empty($all_db_videos)) {
+  // 1. Fill Forever Homes ($db_v2) up to $limit_forever_homes (6)
+  foreach ($all_db_videos as $av) {
+    if (count($db_v2) >= $limit_forever_homes) break;
+    if (!in_array($av[0], array_column($db_v2, 0))) {
+      $db_v2[] = $av;
+    }
+  }
+  // 2. Fill Customer Stories ($db_v1) up to $limit_customer_stories (3)
+  foreach ($all_db_videos as $av) {
+    if (count($db_v1) >= $limit_customer_stories) break;
+    if (!in_array($av[0], array_column($db_v1, 0))) {
+      $db_v1[] = $av;
+    }
+  }
+  // 3. Fill Ask Them ($db_v3) up to $limit_ask_them (3)
+  foreach (array_reverse($all_db_videos) as $av) {
+    if (count($db_v3) >= $limit_ask_them) break;
+    if (!in_array($av[0], array_column($db_v3, 0))) {
+      $db_v3[] = $av;
+    }
+  }
+}
+
+// Apply exact limits set at top
+$db_v2 = array_slice($db_v2, 0, $limit_forever_homes);
+$db_v1 = array_slice($db_v1, 0, $limit_customer_stories);
+$db_v3 = array_slice($db_v3, 0, $limit_ask_them);
 
 // Reviews / Testimonials 
 $db_reviews = [];
 $colors = ['#4a90e2', '#e91e63', '#4caf50', '#ff9800', '#9c27b0'];
 $color_i = 0;
-$rev_q = mysqli_query($conn, "SELECT * FROM testimonials WHERE status=1");
+$rev_q = mysqli_query($conn, "SELECT * FROM testimonials WHERE status=1 ORDER BY test_id DESC");
 if ($rev_q) {
   while ($row = mysqli_fetch_assoc($rev_q)) {
     $db_reviews[] = [$row['name'], $row['designation'], date('M Y', strtotime($row['created_at'])), 5, '', $row['message'], $colors[$color_i % count($colors)]];
@@ -80,7 +146,7 @@ $db_gallery = [];
 $gal_q = mysqli_query($conn, "SELECT * FROM gallery ORDER BY ID DESC LIMIT 8");
 if ($gal_q) {
   while ($row = mysqli_fetch_assoc($gal_q)) {
-    $db_gallery[] = 'admin/' . $row['image_path'];
+    $db_gallery[] = 'admin/' . ltrim($row['image_path'], '/');
   }
 }
 
@@ -89,8 +155,8 @@ $db_blog = [];
 $blog_q = mysqli_query($conn, "SELECT * FROM blogs WHERE status=1 ORDER BY created_at DESC LIMIT 3");
 if ($blog_q) {
   while ($row = mysqli_fetch_assoc($blog_q)) {
-    $desc = strip_tags($row['description']);
-    $excerpt = mb_substr($desc, 0, 100) . '...';
+    $desc_text = strip_tags($row['description']);
+    $excerpt = mb_substr($desc_text, 0, 100) . '...';
     $db_blog[] = [
       'slug'    => $row['slug'],
       'title'   => $row['title'],
@@ -108,7 +174,7 @@ $contact_q = mysqli_query($conn, "SELECT * FROM contacts LIMIT 1");
 $contact = mysqli_fetch_assoc($contact_q);
 
 // ==========================================
-// 3. INQUIRY FORM HANDLING (Insert to DB)
+// 4. INQUIRY FORM HANDLING (Insert to DB)
 // ==========================================
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['website'])) {
@@ -133,37 +199,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['website'])) {
 require __DIR__ . '/includes/header.php';
 ?>
 <main id="home">
- <?php
-$hero_slides = [];
-$hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
-if ($hero_q && mysqli_num_rows($hero_q) > 0) {
-    while ($h_row = mysqli_fetch_assoc($hero_q)) {
-        $b_path = $h_row['banner_path'];
-        if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
-            $b_path = 'admin/' . ltrim($b_path, '/');
-        }
-        
-        $hero_slides[] = [
-            'title' => $h_row['title'],
-            'description' => $h_row['description'],
-            'image_url' => $b_path,
-            'link_url' => !empty($h_row['link_url']) ? $h_row['link_url'] : '#breeds'
-        ];
-    }
-}
+  <!-- HERO (Dynamic Slider from banners table) -->
+  <?php
+  $hero_slides = [];
+  $hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
+  if ($hero_q && mysqli_num_rows($hero_q) > 0) {
+      while ($h_row = mysqli_fetch_assoc($hero_q)) {
+          $b_path = $h_row['banner_path'];
+          if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
+              $b_path = 'admin/' . ltrim($b_path, '/');
+          }
+          
+          $hero_slides[] = [
+              'title'       => $h_row['title'],
+              'description' => $h_row['description'],
+              'image_url'   => $b_path,
+              'link_url'    => !empty($h_row['link_url']) ? $h_row['link_url'] : '#breeds'
+          ];
+      }
+  }
 
-// Fallback agar banners table khali ho
-if (empty($hero_slides)) {
-    $hero_slides[] = [
-        'title' => 'Bring home a healthy puppy you can trust.',
-        'description' => 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.',
-        'image_url' => 'admin/assets/img/uploads/golden.png',
-        'link_url' => '#breeds'
-    ];
-}
-?>
+  // Fallback agar banners table khali ho
+  if (empty($hero_slides)) {
+      $hero_slides[] = [
+          'title'       => 'Bring home a healthy puppy you can trust.',
+          'description' => 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.',
+          'image_url'   => 'admin/assets/img/uploads/golden.png',
+          'link_url'    => '#breeds'
+      ];
+  }
+  ?>
 
-<section class="hero" style="padding-bottom:0; position:relative; overflow:hidden;">
+  <section class="hero" style="padding-bottom:0; position:relative; overflow:hidden;">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <?php for ($k = 0; $k < 9; $k++): ?>
@@ -212,103 +279,136 @@ if (empty($hero_slides)) {
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
-</section>
+  </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const panes = document.querySelectorAll('.hero-slide-pane');
-    const dots = document.querySelectorAll('.h-dot');
-    if (panes.length <= 1) return;
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const panes = document.querySelectorAll('.hero-slide-pane');
+      const dots = document.querySelectorAll('.h-dot');
+      if (panes.length <= 1) return;
 
-    let currentSlide = 0;
-    function showSlide(index) {
-        panes.forEach((pane, idx) => {
-            pane.style.display = (idx === index) ? 'contents' : 'none';
-        });
-        dots.forEach((dot, idx) => {
-            dot.style.background = (idx === index) ? 'var(--teal, #0d9488)' : '#cbd5e1';
-        });
-        currentSlide = index;
-    }
+      let currentSlide = 0;
+      function showSlide(index) {
+          panes.forEach((pane, idx) => {
+              pane.style.display = (idx === index) ? 'contents' : 'none';
+          });
+          dots.forEach((dot, idx) => {
+              dot.style.background = (idx === index) ? 'var(--teal, #0d9488)' : '#cbd5e1';
+          });
+          currentSlide = index;
+      }
 
-    let slideInterval = setInterval(() => {
-        let next = (currentSlide + 1) % panes.length;
-        showSlide(next);
-    }, 5000);
+      let slideInterval = setInterval(() => {
+          let next = (currentSlide + 1) % panes.length;
+          showSlide(next);
+      }, 5000);
 
-    dots.forEach((dot, idx) => {
-        dot.addEventListener('click', () => {
-            clearInterval(slideInterval);
-            showSlide(idx);
-        });
-    });
-});
-</script>
+      dots.forEach((dot, idx) => {
+          dot.addEventListener('click', () => {
+              clearInterval(slideInterval);
+              showSlide(idx);
+          });
+      });
+  });
+  </script>
 
   <!-- MARQUEE -->
   <div class="marq">
     <div class="marq-track">
-      <?php for ($k = 0; $k < 2; $k++): foreach (['Vet checked puppies', '100% vaccinated', 'Pure breed guarantee', 'Visit before you buy', 'Lifetime care support', 'KCI registered puppies', 'Rated ' . ($rating['score'] ?? '4.9') . ' on Google', 'Visit us in Patel Nagar'] as $t): ?><span><b>✦</b><?= h($t) ?></span><?php endforeach;
-                                                                                                                                                                                                                                                                                                                        endfor; ?>
+      <?php for ($k = 0; $k < 2; $k++): foreach (['Vet checked puppies', '100% vaccinated', 'Pure breed guarantee', 'Visit before you buy', 'Lifetime care support', 'KCI registered puppies', 'Rated ' . ($rating['score'] ?? '4.9') . ' on Google', 'Visit us in Patel Nagar'] as $t): ?><span><b>✦</b><?= h($t) ?></span><?php endforeach; endfor; ?>
     </div>
   </div>
 
-<!-- OUR HAPPY CUSTOMERS (New Animated & Auto-Sliding Section) -->
+  <!-- OUR HAPPY CUSTOMERS (Larger & More Attractive Cards + Video Grid Fixes) -->
   <style>
-    .hc-wrapper { padding: 80px 0; background: var(--bg-alt, #f8f9fa); overflow: hidden; }
-    .hc-container { position: relative; max-width: 100%; }
+    .hc-wrapper { padding: 85px 0; background: var(--bg-alt, #f8f9fa); overflow: hidden; }
+    .hc-container { position: relative; max-width: 1440px; margin: 0 auto; }
     .hc-slider { 
-      display: flex; gap: 20px; overflow-x: auto; padding: 20px 5%; 
+      display: flex; gap: 26px; overflow-x: auto; padding: 24px 4%; 
       scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; 
-      scroll-behavior: smooth; /* Smooth sliding ke liye */
+      scroll-behavior: smooth;
     }
     .hc-slider::-webkit-scrollbar { display: none; }
     
+    /* Bigger, Bolder & More Attractive Customer Cards */
     .hc-item { 
-      flex: 0 0 calc(20% - 16px); 
+      flex: 0 0 calc(28% - 18px); 
+      min-width: 310px;
       scroll-snap-align: center; 
-      border-radius: 20px; 
+      border-radius: 26px; 
       overflow: hidden; 
-      box-shadow: 0 12px 35px rgba(0,0,0,0.08); 
-      transition: transform 0.4s ease, box-shadow 0.4s ease; 
-      aspect-ratio: 3 / 4;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12); 
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease; 
+      aspect-ratio: 3 / 3.9;
       position: relative;
       cursor: grab;
+      border: 4px solid #ffffff;
     }
-    /* Responsive sizing */
-    @media(max-width: 1024px) { .hc-item { flex: 0 0 calc(33.333% - 13px); } }
-    @media(max-width: 768px) { .hc-item { flex: 0 0 calc(50% - 10px); } }
-    @media(max-width: 480px) { .hc-item { flex: 0 0 calc(75% - 10px); } }
+    @media(max-width: 1100px) { .hc-item { flex: 0 0 calc(40% - 16px); min-width: 280px; } }
+    @media(max-width: 768px)  { .hc-item { flex: 0 0 calc(65% - 14px); min-width: 260px; } }
+    @media(max-width: 480px)  { .hc-item { flex: 0 0 calc(84% - 10px); min-width: 240px; } }
     
-    .hc-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-    .hc-item:hover { transform: translateY(-12px); box-shadow: 0 20px 45px rgba(0,0,0,0.12); }
+    .hc-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.65s ease; }
+    .hc-item:hover { transform: translateY(-12px) scale(1.01); box-shadow: 0 26px 55px rgba(15, 23, 42, 0.18); }
     .hc-item:hover img { transform: scale(1.08); }
     .hc-item::after {
-      content: ''; position: absolute; inset: 0; border-radius: 20px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3); pointer-events: none;
+      content: ''; position: absolute; inset: 0; border-radius: 22px;
+      background: linear-gradient(to top, rgba(15,23,42,0.28) 0%, transparent 35%);
+      pointer-events: none;
     }
 
     /* Premium Navigation Arrows */
     .hc-nav { 
       position: absolute; top: 50%; transform: translateY(-50%); 
-      width: 48px; height: 48px; background: #fff; 
+      width: 54px; height: 54px; background: #fff; 
       border: 1px solid #e2e8f0; border-radius: 50%; 
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
+      box-shadow: 0 10px 28px rgba(0,0,0,0.14); 
       cursor: pointer; display: flex; align-items: center; justify-content: center; 
-      z-index: 10; font-size: 20px; color: #334155; 
+      z-index: 10; font-size: 22px; color: #0f172a; 
       transition: all 0.3s ease; 
     }
     .hc-nav:hover { 
-      background: var(--navy, #0f172a); color: #fff; 
-      border-color: var(--navy, #0f172a); 
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3); 
+      background: var(--teal, #0d9488); color: #fff; 
+      border-color: var(--teal, #0d9488); 
+      transform: translateY(-50%) scale(1.08);
     }
-    .hc-prev { left: 2%; }
-    .hc-next { right: 2%; }
-    .hc-nav svg { width: 24px; height: 24px; fill: currentColor; }
-    
-    @media(max-width: 768px) { 
-      .hc-nav { display: none; } /* Mobile pe log swipe karna pasand karte hain */
+    .hc-prev { left: 1.5%; }
+    .hc-next { right: 1.5%; }
+    .hc-nav svg { width: 26px; height: 26px; fill: currentColor; }
+    @media(max-width: 768px) { .hc-nav { display: none; } }
+
+    /* Video Sections Grid Layout Support for 6, 3, and 3 Videos */
+    .vs2 .fan.multi-vids {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .vs2 .fan.multi-vids > * {
+      transform: none !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+    .vs1 .trio {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .vs3 .pp {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    @media(max-width: 900px) {
+      .vs2 .fan.multi-vids, .vs1 .trio, .vs3 .pp {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media(max-width: 560px) {
+      .vs2 .fan.multi-vids, .vs1 .trio, .vs3 .pp {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 
@@ -322,17 +422,16 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     
     <div class="hc-container rv" data-anim="bottom">
-      <!-- Left Arrow -->
       <button class="hc-nav hc-prev" id="hc-prev" aria-label="Previous">
         <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
       </button>
 
-      <!-- Swipeable & Auto-sliding Track -->
       <div class="hc-slider" id="hc-slider">
         <?php 
-        $display_hc = !empty($db_happy_customers) ? $db_happy_customers : $display_gallery;
+        $fallback_gal = !empty($db_gallery) ? $db_gallery : ($gallery ?? []);
+        $display_hc = !empty($db_happy_customers) ? $db_happy_customers : $fallback_gal;
         foreach ($display_hc as $hc_img): 
-          $hc_src = (strpos($hc_img, '/') !== false) ? $hc_img : ph($hc_img, 600);
+          $hc_src = (strpos($hc_img, '/') !== false) ? $hc_img : ph($hc_img, 800);
         ?>
           <div class="hc-item">
             <img src="<?= h($hc_src) ?>" alt="Happy customer with puppy at Kyra Pet Shop" loading="lazy">
@@ -340,29 +439,26 @@ document.addEventListener('DOMContentLoaded', function() {
         <?php endforeach; ?>
       </div>
 
-      <!-- Right Arrow -->
       <button class="hc-nav hc-next" id="hc-next" aria-label="Next">
         <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
       </button>
     </div>
   </section>
 
-  <!-- Auto-scroll & Arrow Logic -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const slider = document.getElementById('hc-slider');
       const btnPrev = document.getElementById('hc-prev');
       const btnNext = document.getElementById('hc-next');
+      if (!slider) return;
       let autoScrollTimer;
 
-      // Kitna scroll karna hai (ek item ki width estimate karke)
       function getScrollAmount() {
         const item = slider.querySelector('.hc-item');
-        return item ? item.offsetWidth + 20 : 300; // width + gap
+        return item ? item.offsetWidth + 26 : 340;
       }
 
       function slideNext() {
-        // Agar end tak pohoch gaye to wapas start par le jao
         if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
           slider.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
@@ -378,48 +474,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      // Buttons par click event
-      btnNext.addEventListener('click', slideNext);
-      btnPrev.addEventListener('click', slidePrev);
+      if (btnNext) btnNext.addEventListener('click', slideNext);
+      if (btnPrev) btnPrev.addEventListener('click', slidePrev);
 
-      // Auto scroll chalu karna (har 3 second mein)
-      function startAutoScroll() {
-        autoScrollTimer = setInterval(slideNext, 3000); 
-      }
+      function startAutoScroll() { autoScrollTimer = setInterval(slideNext, 3200); }
+      function stopAutoScroll() { clearInterval(autoScrollTimer); }
 
-      // Auto scroll rokna (hover/touch par)
-      function stopAutoScroll() {
-        clearInterval(autoScrollTimer);
-      }
-
-      // Mouse aur Touch events jisse user padhte waqt slide na ho
       slider.addEventListener('mouseenter', stopAutoScroll);
       slider.addEventListener('mouseleave', startAutoScroll);
       slider.addEventListener('touchstart', stopAutoScroll, {passive: true});
       slider.addEventListener('touchend', startAutoScroll, {passive: true});
-      btnNext.addEventListener('mouseenter', stopAutoScroll);
-      btnPrev.addEventListener('mouseenter', stopAutoScroll);
+      if (btnNext) btnNext.addEventListener('mouseenter', stopAutoScroll);
+      if (btnPrev) btnPrev.addEventListener('mouseenter', stopAutoScroll);
 
-      // Start by default
       startAutoScroll();
     });
   </script>
 
-  <!-- VISIT BAR -->
-  <!-- <section class="visit">
-    <div class="wrap">
-      <form class="vbar rv" method="post" action="#contact">
-        <h3>Schedule your pet visit</h3>
-        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="hidden" name="breed" value="Shop visit booking">
-        <input name="name" placeholder="Your name" required aria-label="Your name">
-        <input name="phone" type="tel" placeholder="Phone number" required aria-label="Phone number">
-        <button class="btn btn-teal" type="submit">Book now</button>
-      </form>
-    </div>
-  </section> -->
-
-  <!-- BREEDS (Fallback Logic Added) -->
+  <!-- BREEDS -->
   <section id="breeds">
     <div class="wrap">
       <div class="sec-head c"><span class="tag">Find your match</span>
@@ -429,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       <div class="grid4">
         <?php
-        $display_dogs = !empty($db_dogs) ? $db_dogs : array_slice($dogs, 0, 4); // Database ya config array
+        $display_dogs = !empty($db_dogs) ? $db_dogs : array_slice($dogs, 0, 8);
         foreach ($display_dogs as $d) {
           if (function_exists('dog_card')) dog_card($d, $site);
         }
@@ -441,18 +513,20 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- VIDEOS 2: FOREVER HOMES (Fallback Logic Added) -->
+  <!-- VIDEOS 2: FOREVER HOMES (6 Videos Dynamic) -->
   <section class="vs2">
     <div class="wrap">
       <div class="sec-head c"><span class="tag">Forever homes</span>
         <h2>Where our puppies go next</h2>
         <p>The best part of our work is the moment a puppy meets its new family. Here are a few of those moments.</p>
       </div>
-      <div class="fan rv" data-anim="zoom">
+      <?php
+      $display_v2 = !empty($db_v2) ? $db_v2 : array_slice($v2 ?? [], 0, $limit_forever_homes);
+      ?>
+      <div class="fan multi-vids rv" data-anim="zoom">
         <?php
-        $display_v2 = !empty($db_v2) ? $db_v2 : $v2;
         foreach ($display_v2 as $i => $v) {
-          if (function_exists('vcard')) echo vcard($v, $i);
+          if (function_exists('vcard')) echo vcard($v, $i % 3);
         }
         ?>
       </div>
@@ -460,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- GOOGLE REVIEWS (Fallback Logic Added) -->
+  <!-- GOOGLE REVIEWS -->
   <section class="greview" id="reviews">
     <div class="wrap">
       <div class="rhead">
@@ -545,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- GALLERY (Fallback Logic Added & Unsplash Overwrite Fixed) -->
+  <!-- GALLERY -->
   <section id="gallery">
     <div class="wrap">
       <div class="sec-head c"><span class="tag">Gallery</span>
@@ -555,7 +629,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <?php
         $display_gallery = !empty($db_gallery) ? $db_gallery : $gallery;
         foreach ($display_gallery as $g):
-          // Database ke 'admin/uploads...' path me slash (/) hota hai. Slash check karke local path apply hoga varna Unsplash ph() use hoga.
           $img_src = (strpos($g, '/') !== false) ? $g : ph($g, 800);
           $full_src = (strpos($g, '/') !== false) ? $g : ph($g, 1600);
         ?>
@@ -641,7 +714,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- VIDEOS 1: CUSTOMER STORIES (Fallback Logic Added) -->
+  <!-- VIDEOS 1: CUSTOMER STORIES (3 Videos Dynamic) -->
   <section class="videos vs1" id="videos">
     <div class="wrap">
       <div class="rv" data-anim="left">
@@ -657,16 +730,16 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="trio rv" data-anim="right">
         <?php
-        $display_v1 = !empty($db_v1) ? $db_v1 : $v1;
+        $display_v1 = !empty($db_v1) ? $db_v1 : array_slice($v1 ?? [], 0, $limit_customer_stories);
         foreach ($display_v1 as $i => $v) {
-          if (function_exists('vcard')) echo vcard($v, $i);
+          if (function_exists('vcard')) echo vcard($v, $i % 3);
         }
         ?>
       </div>
     </div>
   </section>
 
-  <!-- VIDEOS 3: PUPPY PARENTS (Fallback Logic Added) -->
+  <!-- VIDEOS 3: PUPPY PARENTS / ASK THEM, NOT US (3 Videos Dynamic) -->
   <section class="vs3">
     <div class="wrap">
       <div class="sec-head c"><span class="tag">Puppy parents speak</span>
@@ -675,11 +748,11 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="pp">
         <?php
-        $display_v3 = !empty($db_v3) ? $db_v3 : $v3;
+        $display_v3 = !empty($db_v3) ? $db_v3 : array_slice($v3 ?? [], 0, $limit_ask_them);
         foreach ($display_v3 as $i => $v):
         ?>
           <div class="ppc rv">
-            <?php if (function_exists('vcard')) echo vcard($v, $i); ?>
+            <?php if (function_exists('vcard')) echo vcard($v, $i % 3); ?>
             <div class="q"><?= stars(5) ?><b><?= h($v[1] ?? 'Customer') ?></b><span>Customer feedback at Kyra Pet Shop</span></div>
           </div>
         <?php endforeach; ?>
@@ -701,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </section>
 
-  <!-- BLOG PREVIEW (Fallback Logic Added) -->
+  <!-- BLOG PREVIEW -->
   <section class="feat" style="padding-bottom:80px">
     <div class="wrap">
       <div class="sec-head c"><span class="tag">Pet care tips</span>
