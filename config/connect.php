@@ -12,7 +12,7 @@ if ($local) {
     $username = 'root';
     $password = '';
     $dbName = 'kyrapet';
-    $site = "http://localhost/office_php_project/kyrapet/";
+    $site = "http://localhost/projects/kyrapet/";
 } else {
     $host = 'localhost';
     $username = 'u799879276_bhagirath_db';

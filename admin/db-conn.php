@@ -14,13 +14,13 @@ if ($local) {
     $username = 'root';
     $password = '';
     $dbName = 'kyrapet';
-    $site = "http://localhost/office_php_project/kyrapet/";
+    $site = "http://localhost/projects/kyrapet/";
 } else {
     $host = 'localhost';
-    $username = 'u799879276_bhagirath_db';
-    $password = 'Bhagi@rath1';
-    $dbName = 'u799879276_bhagirath_db';
-    $site = 'https://bhagirathenterprises.co.in/';
+    $username = 'u776339737_kyra_pet';
+    $password = 'Kyra@pet1';
+    $dbName = 'u776339737_kyra_pet';
+    $site = 'https://kyrapetshop.in/';
 }
 
 // Make `$site` global

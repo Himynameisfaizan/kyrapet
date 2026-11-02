@@ -89,6 +89,15 @@ if (!isset($_SESSION['admin_logged_in'])) {
         </ul>
     </li>
 
+    <li>
+        <a class="has-arrow" href="#"><i class="fas fa-envelope" style="color: #27ae60;"></i> <span>Custom
+                Page</span></a>
+        <ul>
+            <li><a href="add-page.php">Add Custom Page</a></li>
+            <li><a href="view-pages.php">View Custom Page</a></li>
+        </ul>
+    </li>
+
 
 
     <!-- <li>
@@ -184,11 +193,11 @@ if (!isset($_SESSION['admin_logged_in'])) {
 </nav>
 
 <script>
-    document.getElementById('sidebarSearch').addEventListener('input', function() {
-        let filter = this.value.toLowerCase();
-        document.querySelectorAll('#sidebar_menu li').forEach(item => {
-            let text = item.textContent.toLowerCase();
-            item.style.display = text.includes(filter) ? '' : 'none';
-        });
+document.getElementById('sidebarSearch').addEventListener('input', function() {
+    let filter = this.value.toLowerCase();
+    document.querySelectorAll('#sidebar_menu li').forEach(item => {
+        let text = item.textContent.toLowerCase();
+        item.style.display = text.includes(filter) ? '' : 'none';
     });
+});
 </script>
