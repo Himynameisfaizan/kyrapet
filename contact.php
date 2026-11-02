@@ -1,9 +1,6 @@
 <?php
 require __DIR__.'/config/connect.php';
 require __DIR__.'/includes/config.php';
-
-$title='Contact Us | Kyra Pet Shop, Patel Nagar, New Delhi';
-$desc='Call, WhatsApp or visit Kyra Pet Shop in Patel Nagar, New Delhi. Send an inquiry and our team will get back to you shortly.';
 $page='contact';
 
 // ==========================================
@@ -85,61 +82,96 @@ if (function_exists('banner')) {
 }
 ?>
 <main>
-<!-- CONTACT CARDS -->
-<section style="padding:40px 0 20px"><div class="wrap">
-  <div class="cgrid">
-    <?php foreach($cards as $c): ?>
-    <a class="fcard rv" href="<?=h($c[3])?>" <?=strpos($c[3],'http')===0?'target="_blank" rel="noopener"':''?>>
-      <i><?=$c[0]?></i><h3><?=h($c[1])?></h3><p style="color:var(--ink);font-weight:600;overflow-wrap:anywhere"><?=h($c[2])?></p><span class="more" style="font-size:14px"><?=h($c[4])?> →</span>
-    </a>
-    <?php endforeach; ?>
-  </div>
-</div></section>
+    <!-- CONTACT CARDS -->
+    <section style="padding:40px 0 20px">
+        <div class="wrap">
+            <div class="cgrid">
+                <?php foreach($cards as $c): ?>
+                <a class="fcard rv" href="<?=h($c[3])?>"
+                    <?=strpos($c[3],'http')===0?'target="_blank" rel="noopener"':''?>>
+                    <i><?=$c[0]?></i>
+                    <h3><?=h($c[1])?></h3>
+                    <p style="color:var(--ink);font-weight:600;overflow-wrap:anywhere"><?=h($c[2])?></p><span
+                        class="more" style="font-size:14px"><?=h($c[4])?> →</span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
 
-<!-- FORM + MAP -->
-<section class="contact" id="contact" style="padding-top:60px"><div class="wrap">
-  <div class="sec-head c"><span class="tag">Send an inquiry</span><h2>Tell us what you are looking for</h2><p><?=h($shop_owner)?> will call you back, usually within a few hours.</p></div>
-  <div class="cbox rv">
-    <form class="form" method="post" action="contact.php#contact">
-      <h3>Looking for a specific breed?</h3><p class="sub">Share your details and we will send photos, videos and health records.</p>
-      <?php if($msg==='ok'): ?><div class="alert ok" role="status">Thank you. We received your inquiry and will call you soon.</div>
-      <?php elseif($msg==='err'): ?><div class="alert err" role="alert">Please enter your name and a valid phone number.</div><?php endif; ?>
-      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <div class="f2"><input name="name" placeholder="Your name" required value="<?=h($old['name'])?>"><input name="phone" type="tel" placeholder="Phone number" required value="<?=h($old['phone'])?>"></div>
-      <input name="email" type="email" placeholder="Email (optional)" value="<?=h($old['email'])?>">
-      <div class="f2">
-        <select name="topic" aria-label="I want to">
-          <?php foreach(['Buy a puppy','Visit the shop','Puppy care advice','Something else'] as $t): ?><option <?=$old['topic']===$t?'selected':''?>><?=h($t)?></option><?php endforeach; ?>
-        </select>
-        <input name="breed" placeholder="Preferred breed" value="<?=h($old['breed'])?>">
-      </div>
-      <input name="date" type="date" aria-label="Preferred visit date" value="<?=h($old['date'])?>" min="<?=date('Y-m-d')?>">
-      <textarea name="message" rows="3" placeholder="Anything specific? (age, gender, budget, etc.)"><?=h($old['message'])?></textarea>
-      <button class="btn btn-navy" type="submit">Send inquiry</button>
-      <div class="info"><span>📞 <?=h($shop_phone)?></span><span>🕒 <?=h($shop_hours)?></span></div>
-    </form>
-    <div><iframe title="Kyra Pet Shop location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="<?=h($shop_map)?>"></iframe></div>
-  </div>
-</div></section>
+    <!-- FORM + MAP -->
+    <section class="contact" id="contact" style="padding-top:60px">
+        <div class="wrap">
+            <div class="sec-head c"><span class="tag">Send an inquiry</span>
+                <h2>Tell us what you are looking for</h2>
+                <p><?=h($shop_owner)?> will call you back, usually within a few hours.</p>
+            </div>
+            <div class="cbox rv">
+                <form class="form" method="post" action="contact.php#contact">
+                    <h3>Looking for a specific breed?</h3>
+                    <p class="sub">Share your details and we will send photos, videos and health records.</p>
+                    <?php if($msg==='ok'): ?><div class="alert ok" role="status">Thank you. We received your inquiry and
+                        will call you soon.</div>
+                    <?php elseif($msg==='err'): ?><div class="alert err" role="alert">Please enter your name and a valid
+                        phone number.</div><?php endif; ?>
+                    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div class="f2"><input name="name" placeholder="Your name" required
+                            value="<?=h($old['name'])?>"><input name="phone" type="tel" placeholder="Phone number"
+                            required value="<?=h($old['phone'])?>"></div>
+                    <input name="email" type="email" placeholder="Email (optional)" value="<?=h($old['email'])?>">
+                    <div class="f2">
+                        <select name="topic" aria-label="I want to">
+                            <?php foreach(['Buy a puppy','Visit the shop','Puppy care advice','Something else'] as $t): ?>
+                            <option <?=$old['topic']===$t?'selected':''?>><?=h($t)?></option><?php endforeach; ?>
+                        </select>
+                        <input name="breed" placeholder="Preferred breed" value="<?=h($old['breed'])?>">
+                    </div>
+                    <input name="date" type="date" aria-label="Preferred visit date" value="<?=h($old['date'])?>"
+                        min="<?=date('Y-m-d')?>">
+                    <textarea name="message" rows="3"
+                        placeholder="Anything specific? (age, gender, budget, etc.)"><?=h($old['message'])?></textarea>
+                    <button class="btn btn-navy" type="submit">Send inquiry</button>
+                    <div class="info"><span>📞 <?=h($shop_phone)?></span><span>🕒 <?=h($shop_hours)?></span></div>
+                </form>
+                <div><iframe title="Kyra Pet Shop location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        src="<?=h($shop_map)?>"></iframe></div>
+            </div>
+        </div>
+    </section>
 
-<!-- PLAN YOUR VISIT -->
-<section><div class="wrap">
-  <div class="sec-head c"><span class="tag">Plan your visit</span><h2>What to expect when you come in</h2></div>
-  <div class="fgrid"><?php foreach($visit as $i=>$v): ?>
-    <div class="fcard rv"><i><?=$i+1?></i><h3><?=h($v[0])?></h3><p><?=h($v[1])?></p></div><?php endforeach; ?></div>
-  <div class="hours rv">
-    <div><b>Shop timings</b><span><?=h($shop_hours)?></span></div>
-    <div><b>Address</b><span><?=h($shop_addr)?></span></div>
-    <div><b>Phone</b><span><a href="tel:<?=h($shop_tel)?>"><?=h($shop_phone)?></a></span></div>
-  </div>
-</div></section>
+    <!-- PLAN YOUR VISIT -->
+    <section>
+        <div class="wrap">
+            <div class="sec-head c"><span class="tag">Plan your visit</span>
+                <h2>What to expect when you come in</h2>
+            </div>
+            <div class="fgrid"><?php foreach($visit as $i=>$v): ?>
+                <div class="fcard rv"><i><?=$i+1?></i>
+                    <h3><?=h($v[0])?></h3>
+                    <p><?=h($v[1])?></p>
+                </div><?php endforeach; ?>
+            </div>
+            <div class="hours rv">
+                <div><b>Shop timings</b><span><?=h($shop_hours)?></span></div>
+                <div><b>Address</b><span><?=h($shop_addr)?></span></div>
+                <div><b>Phone</b><span><a href="tel:<?=h($shop_tel)?>"><?=h($shop_phone)?></a></span></div>
+            </div>
+        </div>
+    </section>
 
-<!-- FAQ -->
-<section class="feat"><div class="wrap">
-  <div class="sec-head c"><span class="tag">FAQ</span><h2>Quick answers</h2></div>
-  <div class="faq-list"><?php foreach($qa as $f): ?><details><summary><?=h($f[0])?></summary><p><?=h($f[1])?></p></details><?php endforeach; ?></div>
-</div></section>
-<?php 
+    <!-- FAQ -->
+    <section class="feat">
+        <div class="wrap">
+            <div class="sec-head c"><span class="tag">FAQ</span>
+                <h2>Quick answers</h2>
+            </div>
+            <div class="faq-list"><?php foreach($qa as $f): ?><details>
+                    <summary><?=h($f[0])?></summary>
+                    <p><?=h($f[1])?></p>
+                </details><?php endforeach; ?></div>
+        </div>
+    </section>
+    <?php 
 if (function_exists('cta_band')) {
     cta_band('Prefer to talk right now?', 'Call us or message us on WhatsApp and we will help you straight away.'); 
 }
