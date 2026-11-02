@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Agar koi file ya folder exist nahi karta toh 404.php dikhao
+ErrorDocument 404 /projects/kyrapet/404.php
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ 404.php [L]
