@@ -12,13 +12,61 @@ require __DIR__ . '/includes/header.php';
 if (function_exists('banner')) banner('Privacy Policy', 'Privacy Policy', 'We value your trust and are committed to protecting your personal information.');
 ?>
 
-<section style="padding: 60px 0; background: #f8fafc;">
-    <div class="wrap"
-        style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start;">
+<style>
+.policy-sec {
+    padding: 60px 0;
+    background: #f8fafc;
+}
+
+.policy-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 40px;
+    align-items: start;
+}
+
+.policy-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+}
+
+.policy-sidebar {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media (max-width: 992px) {
+    .policy-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .policy-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .policy-sec {
+        padding: 40px 0;
+    }
+
+    .policy-card {
+        padding: 24px;
+    }
+}
+</style>
+
+<section class="policy-sec">
+    <div class="wrap policy-grid">
 
         <!-- Left Content -->
-        <article
-            style="background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.04); border: 1px solid #e2e8f0;">
+        <article class="policy-card">
             <p style="color:#64748b; margin-bottom: 30px; font-size:14.5px;"><strong>Last Updated:</strong>
                 <?= date('F d, Y'); ?></p>
 
@@ -71,14 +119,14 @@ if (function_exists('banner')) banner('Privacy Policy', 'Privacy Policy', 'We va
                     style="background: #f1f5f9; padding: 20px; border-radius: 12px; border-left: 4px solid var(--teal, #0d9488); margin-top: 15px;">
                     <strong>Kyra Pet Shop</strong><br>
                     WZ-23 Khampur, Patel Nagar, New Delhi - 110008<br>
-                    <strong>Phone:</strong> <?= h($site['phone'] ?? '+91-9582799502') ?><br>
-                    <strong>Email:</strong> <?= h($site['email'] ?? 'kyrapetshop@gmail.com') ?>
+                    <strong>Phone:</strong> <?= h($site['phone'] ?? '+91 9582799502') ?><br>
+                    <strong>Email:</strong> <?= h($site['email'] ?? 'kyrapetshop12@gmail.com') ?>
                 </div>
             </div>
         </article>
 
         <!-- Right Sidebar -->
-        <aside style="position: sticky; top: 90px; display:flex; flex-direction:column; gap:24px;">
+        <aside class="policy-sidebar">
             <div
                 style="background:#fff; border-radius:20px; padding:24px; border:1px solid #e2e8f0; box-shadow:0 10px 30px rgba(15,23,42,0.04);">
                 <h4
