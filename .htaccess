@@ -1,8 +1,20 @@
 RewriteEngine On
+# Base path (Live server par isko sirf / rakhna)
+RewriteBase /projects/kyrapet/
 
-# Agar koi file ya folder exist nahi karta toh 404.php dikhao
-ErrorDocument 404 /projects/kyrapet/404.php
+# 1. Sitemap Dynamic Route
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+# 2. SEO Friendly Routes (Breed, Blog, Custom Pages, Category)
+RewriteRule ^breed/([a-zA-Z0-9_-]+)$ breed.php?slug=$1 [L,QSA]
+RewriteRule ^blog-post/([a-zA-Z0-9_-]+)$ blog-post.php?slug=$1 [L,QSA]
+RewriteRule ^page/([a-zA-Z0-9_-]+)$ page.php?slug=$1 [L,QSA]
+RewriteRule ^category/([a-zA-Z0-9_-]+)$ category.php?slug=$1 [L,QSA]
+
+# 3. Remove .php extension from normal pages (like /about, /contact)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^.*$ 404.php [L]
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# 4. 404 Error Page 
+ErrorDocument 404 /projects/kyrapet/404.php
