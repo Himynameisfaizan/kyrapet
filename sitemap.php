@@ -22,7 +22,7 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     $static_pages = [
     '', '/about', '/contact', '/gallery', '/breeds', '/blog',
     '/reviews', '/how-it-works', '/location', '/privacy-policy',
-    '/refund-policy', '/shipping-policy', '/terms'
+    '/refund-policy', '/shipping-policy', '/terms-condition'
     ];
     foreach ($static_pages as $page) {
     addUrlNode($base_url . $page, ($page == '' ? 'daily' : 'weekly'), ($page == '' ? '1.0' : '0.8'));

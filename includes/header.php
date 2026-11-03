@@ -11,9 +11,15 @@ if (empty($title) || empty($desc)) {
     $meta_q = mysqli_query($conn, "SELECT * FROM meta WHERE page_url='$current_page_url' LIMIT 1");
     if ($meta_q && mysqli_num_rows($meta_q) > 0) {
         $meta_data = mysqli_fetch_assoc($meta_q);
-        if (empty($title)) { $title = $meta_data['meta_title']; }
-        if (empty($desc)) { $desc = $meta_data['meta_desc']; }
-        if (empty($meta_key)) { $meta_key = $meta_data['meta_key'] ?? ''; }
+        if (empty($title)) {
+            $title = $meta_data['meta_title'];
+        }
+        if (empty($desc)) {
+            $desc = $meta_data['meta_desc'];
+        }
+        if (empty($meta_key)) {
+            $meta_key = $meta_data['meta_key'] ?? '';
+        }
     }
 }
 
@@ -27,8 +33,12 @@ if (empty($schema_markup)) {
 }
 
 // Default Fallback agar database mein bhi kuch na ho
-if (empty($title)) { $title = 'Kyra Pet Shop | Healthy Puppies in New Delhi'; }
-if (empty($desc)) { $desc = 'Premium pure breed puppies in New Delhi. Vet checked, 100% vaccinated. Visit Kyra Pet Shop.'; }
+if (empty($title)) {
+    $title = 'Kyra Pet Shop | Healthy Puppies in New Delhi';
+}
+if (empty($desc)) {
+    $desc = 'Premium pure breed puppies in New Delhi. Vet checked, 100% vaccinated. Visit Kyra Pet Shop.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
