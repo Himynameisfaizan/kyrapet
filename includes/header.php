@@ -82,12 +82,12 @@ $canonical_url = $protocol . $_SERVER['HTTP_HOST'] . $clean_path;
 
     <header class="nav" id="nav">
         <div class="wrap">
-            <a class="logo" href="index.php" aria-label="Kyra Pet Shop home"><img src="assets/img/logo.png"
+            <a class="logo" href="./" aria-label="Kyra Pet Shop home"><img src="assets/img/logo.png"
                     alt="Kyra Pet Shop"></a>
             <button class="burger" id="burger" aria-label="Open menu"
                 aria-expanded="false"><span></span><span></span><span></span></button>
             <nav class="menu" id="menu">
-                <a class="<?= isset($a) && is_callable($a) ? $a('home') : '' ?>" href="index.php">Home</a>
+                <a class="<?= isset($a) && is_callable($a) ? $a('home') : '' ?>" href="./">Home</a>
                 <div class="dd-wrap">
                     <button class="dd-toggle<?= !empty($aboutGroup) ? ' active' : '' ?>" aria-expanded="false"
                         aria-haspopup="true">About Us</button>

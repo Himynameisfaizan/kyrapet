@@ -541,9 +541,9 @@ require __DIR__ . '/includes/header.php';
     <section class="cpage-hero">
         <div class="wrap">
             <div class="cpage-breadcrumb">
-                <a href="index.php">Home</a>
+                <a href="./">Home</a>
                 <span>/</span>
-                <a href="location.php">Locations &amp; Guides</a>
+                <a href="location">Locations &amp; Guides</a>
                 <span>/</span>
                 <span><?= h($breadcrumb_name) ?></span>
             </div>
@@ -694,7 +694,7 @@ require __DIR__ . '/includes/header.php';
                                 $isActive = ($op['slug_url'] === $slug) ? 'active' : '';
                             ?>
                             <li>
-                                <a href="page.php?slug=<?= rawurlencode($op['slug_url']) ?>" class="<?= $isActive ?>">
+                                <a href="page/<?= rawurlencode($op['slug_url']) ?>" class="<?= $isActive ?>">
                                     <span><?= h(ucwords($opTitle)) ?></span>
                                     <span>→</span>
                                 </a>

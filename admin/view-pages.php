@@ -26,17 +26,23 @@ $result = $conn->query("SELECT * FROM custom_pages ORDER BY id DESC");
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>View Custom Pages | Admin Panel</title>
     <?php include "links.php"; ?>
 </head>
+
 <body class="crm_body_bg">
     <?php include "header.php"; ?>
-    
+
     <section class="main_content dashboard_part large_header_bg">
-        <div class="container-fluid g-0"><div class="row"><div class="col-lg-12 p-0"><?php include "top_nav.php"; ?></div></div></div>
+        <div class="container-fluid g-0">
+            <div class="row">
+                <div class="col-lg-12 p-0"><?php include "top_nav.php"; ?></div>
+            </div>
+        </div>
 
         <div class="main_content_iner">
             <div class="container-fluid p-0 sm_padding_15px">
@@ -57,13 +63,14 @@ $result = $conn->query("SELECT * FROM custom_pages ORDER BY id DESC");
                             </div>
                             <div class="white_card_body">
                                 <?php if (isset($_SESSION['message'])): ?>
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        <?= $_SESSION['message']; ?>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                    <?php unset($_SESSION['message']); ?>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <?= $_SESSION['message']; ?>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                <?php unset($_SESSION['message']); ?>
                                 <?php endif; ?>
-                                
+
                                 <div class="table-responsive">
                                     <table class="table table-hover table-bordered">
                                         <thead class="bg-dark text-white">
@@ -78,34 +85,45 @@ $result = $conn->query("SELECT * FROM custom_pages ORDER BY id DESC");
                                         </thead>
                                         <tbody>
                                             <?php if($result && mysqli_num_rows($result) > 0): ?>
-                                                <?php while ($page = $result->fetch_assoc()): ?>
-                                                    <tr>
-                                                        <td><?= htmlspecialchars($page['id']); ?></td>
-                                                        <td><strong><?= htmlspecialchars($page['page_title']); ?></strong></td>
-                                                        <td>
-                                                            <!-- Frontend Link -->
-                                                            <a href="../page.php?slug=<?= htmlspecialchars($page['slug_url']); ?>" target="_blank" class="text-primary text-decoration-none">
-                                                                /page.php?slug=<?= htmlspecialchars($page['slug_url']); ?> <i class="fa-solid fa-external-link-alt ms-1" style="font-size: 12px;"></i>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge <?= $page['status'] == 1 ? 'bg-success' : 'bg-secondary'; ?>">
-                                                                <?= $page['status'] == 1 ? 'Published' : 'Draft'; ?>
-                                                            </span>
-                                                        </td>
-                                                        <td><?= date('M d, Y', strtotime($page['created_at'])); ?></td>
-                                                        <td>
-                                                            <a href="edit-page.php?id=<?= $page['id']; ?>" class="btn btn-sm btn-outline-primary" title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a>
-                                                            <a href="?deleteId=<?= $page['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this page? This cannot be undone.');" title="Delete">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php endwhile; ?>
+                                            <?php while ($page = $result->fetch_assoc()): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($page['id']); ?></td>
+                                                <td><strong><?= htmlspecialchars($page['page_title']); ?></strong></td>
+                                                <td>
+                                                    <!-- Frontend Link -->
+                                                    <a href="../page/<?= htmlspecialchars($page['slug_url']); ?>"
+                                                        target="_blank" class="text-primary text-decoration-none">
+                                                        /page/<?= htmlspecialchars($page['slug_url']); ?> <i
+                                                            class="fa-solid fa-external-link-alt ms-1"
+                                                            style="font-size: 12px;"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge <?= $page['status'] == 1 ? 'bg-success' : 'bg-secondary'; ?>">
+                                                        <?= $page['status'] == 1 ? 'Published' : 'Draft'; ?>
+                                                    </span>
+                                                </td>
+                                                <td><?= date('M d, Y', strtotime($page['created_at'])); ?></td>
+                                                <td>
+                                                    <a href="edit-page.php?id=<?= $page['id']; ?>"
+                                                        class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="?deleteId=<?= $page['id']; ?>"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this page? This cannot be undone.');"
+                                                        title="Delete">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <?php endwhile; ?>
                                             <?php else: ?>
-                                                <tr><td colspan="6" class="text-center py-4 text-muted">No custom pages created yet.</td></tr>
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4 text-muted">No custom pages
+                                                    created yet.</td>
+                                            </tr>
                                             <?php endif; ?>
                                         </tbody>
                                     </table>
@@ -119,4 +137,5 @@ $result = $conn->query("SELECT * FROM custom_pages ORDER BY id DESC");
         <?php include "footer.php"; ?>
     </section>
 </body>
+
 </html>
