@@ -1,126 +1,112 @@
 <?php
-include('config/connect.php');
+require __DIR__ . '/config/connect.php';
+require __DIR__ . '/includes/config.php';
 
-// SEO Meta Variables
-$pageTitle = "Privacy Policy | AKR Build Tech";
-$meta_description = "Read the Privacy Policy of AKR Build Tech regarding personal data protection for our construction materials, AAC Block Jointing Mortar, and infrastructure products.";
-$meta_key = "privacy policy, akr build tech, construction materials, aac block jointing mortar, infrastructure";
+$page = 'policy';
 
-include 'includes/header.php';
-include 'includes/breadcrumb.php';
+$title = "Privacy Policy | Kyra Pet Shop New Delhi";
+$desc = "Read the Privacy Policy of Kyra Pet Shop regarding personal data protection for pet parents and online inquiries.";
+$meta_key = "privacy policy, kyra pet shop, pet parent privacy, data protection";
+
+require __DIR__ . '/includes/header.php';
+if (function_exists('banner')) banner('Privacy Policy', 'Privacy Policy', 'We value your trust and are committed to protecting your personal information.');
 ?>
 
-<!-- Main Policy Section (Blog Details Style: Left Content + Right Sidebar) -->
-<section class="py-5" style="background-color: #f8f9fa;">
-    <div class="container">
-        <div class="row g-5">
-            
-            <!-- LEFT COLUMN: Policy Content -->
-            <div class="col-lg-8">
-                <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
-                    <h1 class="mb-3" style="color: #2b5e2c; font-weight: 700;">Privacy Policy</h1>
-                    <p class="text-muted mb-5"><strong>Last Updated:</strong> <?= date('F d, Y'); ?></p>
+<section style="padding: 60px 0; background: #f8fafc;">
+    <div class="wrap"
+        style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start;">
 
-                    <p>Welcome to <strong>AKR Build Tech</strong>. We respect your privacy and are committed to protecting your personal data. This Privacy Policy outlines how we collect, use, process, and safeguard your information when you visit our website, purchase our premium construction materials—including <strong>AAC Block Jointing Mortar and other infrastructure products</strong>—or use our services.</p>
+        <!-- Left Content -->
+        <article
+            style="background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.04); border: 1px solid #e2e8f0;">
+            <p style="color:#64748b; margin-bottom: 30px; font-size:14.5px;"><strong>Last Updated:</strong>
+                <?= date('F d, Y'); ?></p>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">1. Information We Collect</h4>
-                    <p>To provide you with a seamless and secure shopping and wholesale inquiry experience, we collect the following types of information:</p>
-                    <ul>
-                        <li><strong>Personal Identification Information:</strong> Name, email address, phone number, and business/company details (if applicable).</li>
-                        <li><strong>Shipping & Billing Information:</strong> Delivery address, billing address, postal code, and destination country for domestic or international freight.</li>
-                        <li><strong>Technical Data:</strong> IP address, browser type, time zone setting, operating system, and platform details when browsing our catalog.</li>
-                        <li><strong>Trade & Bulk Order Compliance Data:</strong> For bulk and wholesale orders of construction materials, we may collect business credentials, GST/VAT numbers, or import-export licenses as required by trade regulations.</li>
-                    </ul>
+            <div class="kyra-article-body" style="color: #334155; font-size: 16.5px; line-height: 1.8;">
+                <p>Welcome to <strong>Kyra Pet Shop</strong>. We respect your privacy and are deeply committed to
+                    protecting your personal data. This policy outlines how we collect, use, and safeguard your
+                    information when you visit our website, inquire about our puppies, or use our services.</p>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">2. How We Use Your Information</h4>
-                    <p>We use the information we collect for the following purposes:</p>
-                    <ul>
-                        <li>To process, pack, and fulfill your orders for construction materials, ensuring quality dispatch.</li>
-                        <li>To communicate with you regarding order confirmations, shipping updates, tracking, and customer support.</li>
-                        <li>To process online payments securely and prevent fraudulent activities.</li>
-                        <li>To comply with infrastructure standards, export regulations, and legal trade obligations.</li>
-                        <li>To improve our website functionality, product display, and user experience.</li>
-                    </ul>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">1.
+                    Information We Collect</h3>
+                <p>To help you find the perfect furry companion and arrange safe deliveries, we collect:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom:8px;"><strong>Personal Details:</strong> Name, phone number, and email
+                        address submitted via our inquiry forms or WhatsApp.</li>
+                    <li style="margin-bottom:8px;"><strong>Shipping Information:</strong> Residential address required
+                        for doorstep delivery of your puppy and pet accessories.</li>
+                    <li style="margin-bottom:8px;"><strong>Pet Preferences:</strong> Information regarding the breed,
+                        gender, and age preferences you share with our team.</li>
+                </ul>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">3. Secure Payment Processing</h4>
-                    <p>We do not store your credit card, debit card, UPI, or net banking details on our servers. All financial transactions are handled through secure, PCI-DSS compliant third-party payment gateways. Your payment data is fully encrypted and protected under strict industry standards.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">2. How
+                    We Use Your Information</h3>
+                <p>We use your information exclusively to:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li style="margin-bottom:8px;">Share live photos, videos, and health records of available puppies
+                        directly with you.</li>
+                    <li style="margin-bottom:8px;">Coordinate safe and timely transport/delivery of the puppy to your
+                        location.</li>
+                    <li style="margin-bottom:8px;">Provide post-purchase guidance, vaccination reminders, and dietary
+                        consultation.</li>
+                </ul>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">4. Third-Party Data Sharing</h4>
-                    <p>We do not sell or trade your personal information. However, trusted third parties assist us in conducting our business operations, including:</p>
-                    <ul>
-                        <li><strong>Logistics & Shipping Partners:</strong> Courier companies, transport services, and freight forwarders required to deliver your shipments safely.</li>
-                        <li><strong>Payment Gateways:</strong> Authorized financial processors for transaction management.</li>
-                        <li><strong>Regulatory Authorities:</strong> Government or customs bodies when legally required for export compliance.</li>
-                    </ul>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">3. Data
+                    Sharing & Security</h3>
+                <p>We <strong>do not sell, trade, or rent</strong> your personal contact information to third-party
+                    marketing agencies. Your address and contact details are only shared with trusted pet-relocation
+                    partners (drivers/airlines) strictly for the purpose of safely delivering your puppy.</p>
+                <p>All WhatsApp conversations, photos, and health records shared with you remain confidential between
+                    you and the Kyra Pet Shop team.</p>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">5. Cookies and Tracking Technologies</h4>
-                    <p>Our website uses cookies to enhance browsing efficiency, maintain session preferences, and analyze site traffic. You can choose to disable cookies through your browser, though certain features of the website may not function properly as a result.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">4.
+                    Happy Customers Gallery</h3>
+                <p>We love featuring our happy pet parents! However, we only upload your photos or videos to our
+                    "Customer Stories" or social media platforms with your explicit verbal or written consent.</p>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">6. Data Security</h4>
-                    <p>We implement robust administrative, technical, and physical security measures, including SSL encryption and secure firewalls, to protect your personal data against unauthorized access, disclosure, or misuse.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">5.
+                    Contact Us</h3>
+                <p>If you have any questions regarding your data privacy, please contact:</p>
+                <div
+                    style="background: #f1f5f9; padding: 20px; border-radius: 12px; border-left: 4px solid var(--teal, #0d9488); margin-top: 15px;">
+                    <strong>Kyra Pet Shop</strong><br>
+                    WZ-23 Khampur, Patel Nagar, New Delhi - 110008<br>
+                    <strong>Phone:</strong> <?= h($site['phone'] ?? '+91-9582799502') ?><br>
+                    <strong>Email:</strong> <?= h($site['email'] ?? 'kyrapetshop@gmail.com') ?>
+                </div>
+            </div>
+        </article>
 
-                    <h4 class="mt-5" style="color: #e65c00; font-size: 1.2rem;">7. Contact Us</h4>
-                    <p>If you have any questions or concerns regarding this Privacy Policy, please feel free to contact us:</p>
-                    <div class="p-3 mt-3 rounded" style="background-color: #f1f5f9; border-left: 4px solid var(--primary-green, #2b5e2c);">
-                        <p class="mb-1"><strong>AKR Build Tech</strong></p>
-                        <p class="mb-1"><strong>Specialization:</strong> Suppliers & Exporters of AAC Block Jointing Mortar & Infrastructure Materials</p>
-                        <p class="mb-1"><strong>Phone:</strong> +91-8448211202</p>
-                        <p class="mb-0"><strong>Email:</strong> support@akrbuildtech.com</p>
-                    </div>
+        <!-- Right Sidebar -->
+        <aside style="position: sticky; top: 90px; display:flex; flex-direction:column; gap:24px;">
+            <div
+                style="background:#fff; border-radius:20px; padding:24px; border:1px solid #e2e8f0; box-shadow:0 10px 30px rgba(15,23,42,0.04);">
+                <h4
+                    style="font-size:17px; font-weight:800; color:var(--ink); margin:0 0 16px; padding-bottom:12px; border-bottom:2px solid #f1f5f9;">
+                    📍 Quick Links</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <a href="terms-condition.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Terms
+                        & Conditions →</a>
+                    <a href="shipping-return.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Shipping
+                        Policy →</a>
+                    <a href="refund-policy.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Refund
+                        Policy →</a>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: Sidebar Widgets -->
-            <div class="col-lg-4">
-                <div class="sidebar-widgets position-sticky" style="top: 20px;">
-                    
-                    <!-- Search Widget -->
-                    <div class="widget-box bg-white p-4 rounded shadow-sm border mb-4">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">Search Products</h5>
-                        <form action="products.php" method="GET" class="d-flex">
-                            <input type="text" name="search" class="form-control me-2" placeholder="Search materials, mortar..." required style="font-size: 0.9rem;">
-                            <button type="submit" class="btn text-white px-3" style="background: var(--primary-green, #2b5e2c);"><i class="fa-solid fa-magnifying-glass"></i></button>
-                        </form>
-                    </div>
-
-                    <!-- Categories Widget -->
-                    <div class="widget-box bg-white p-4 rounded shadow-sm border mb-4">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">Categories</h5>
-                        <ul class="list-unstyled mb-0 category-list">
-                            <?php
-                            $catQuery = mysqli_query($conn, "SELECT * FROM categories WHERE status = 1");
-                            if ($catQuery && mysqli_num_rows($catQuery) > 0) {
-                                while($catRow = mysqli_fetch_assoc($catQuery)) {
-                            ?>
-                            <li class="mb-2 pb-2 border-bottom">
-                                <a href="category.php?slug=<?= htmlspecialchars($catRow['slug_url']) ?>" class="text-decoration-none d-flex justify-content-between align-items-center text-muted" style="font-size: 0.95rem;">
-                                    <span><i class="fa-solid fa-angle-right me-2" style="font-size: 0.75rem;"></i> <?= htmlspecialchars($catRow['categories']) ?></span>
-                                </a>
-                            </li>
-                            <?php 
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-
-                    <!-- Request Quote Banner -->
-                    <div class="widget-box rounded shadow-sm text-center p-4 text-white" style="background: linear-gradient(135deg, var(--primary-green, #2b5e2c) 0%, #1a3f1b 100%);">
-                        <div class="icon-wrap mb-3"><i class="fa-solid fa-headset fs-1 text-white opacity-75"></i></div>
-                        <h4 class="fw-bold mb-2 text-white">Bulk Construction Materials?</h4>
-                        <p class="small mb-4 opacity-75">Get premium quality export-grade infrastructure materials at wholesale prices.</p>
-                        <a href="contact.php" class="btn bg-white w-100 fw-bold shadow-sm mb-3" style="color: var(--primary-green, #2b5e2c);">Request Quote</a>
-                        <a href="tel:+918448211202" class="text-white text-decoration-none small fw-bold"><i class="fa-solid fa-phone me-1"></i> +91-8448211202</a>
-                    </div>
-
-                </div>
+            <div
+                style="background:linear-gradient(145deg, var(--navy, #0f172a) 0%, #1e293b 100%); border-radius:20px; padding:28px 24px; color:#fff; text-align:center;">
+                <h4 style="color:#fff; font-size:18px; font-weight:800; margin-bottom:10px;">Find Your Match</h4>
+                <p style="color:#cbd5e1; font-size:14px; margin-bottom:20px;">Browse our healthy, 100% vaccinated
+                    puppies.</p>
+                <a href="breeds.php" class="btn btn-teal" style="width:100%; justify-content:center;">View Puppies</a>
             </div>
+        </aside>
 
-        </div>
     </div>
 </section>
 
-<?php 
-include ('includes/inquiry-form.php');
-include ('includes/footer.php'); 
-?>
+<?php require __DIR__ . '/includes/footer.php'; ?>

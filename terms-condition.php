@@ -1,94 +1,95 @@
 <?php
-include('config/connect.php');
+require __DIR__ . '/config/connect.php';
+require __DIR__ . '/includes/config.php';
 
-$pageTitle = "Terms & Conditions | AKR Build Tech";
-$meta_description = "Read the terms and conditions of AKR Build Tech for purchasing construction materials, AAC Block Jointing Mortar, and infrastructure products.";
-$meta_key = "terms and conditions, akr build tech, export terms, construction materials";
+$page = 'policy';
 
-include 'includes/header.php';
-include 'includes/breadcrumb.php';
+$title = "Terms & Conditions | Kyra Pet Shop New Delhi";
+$desc = "Read the terms and conditions of Kyra Pet Shop for purchasing healthy, purebred, and vaccinated puppies.";
+$meta_key = "terms and conditions, pet shop rules, kyra pet shop, buy puppy safely";
+
+require __DIR__ . '/includes/header.php';
+if (function_exists('banner')) banner('Terms & Conditions', 'Terms', 'Rules and guidelines ensuring ethical practices and healthy pets.');
 ?>
 
-<section class="py-5" style="background-color: #f8f9fa;">
-    <div class="container">
-        <div class="row g-5">
-            
-            <!-- LEFT COLUMN: Content -->
-            <div class="col-lg-8">
-                <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
-                    <h1 class="mb-4" style="color: #2b5e2c; font-weight: 700;">Terms & Conditions</h1>
-                    <p class="text-muted mb-5"><strong>Last Updated:</strong> <?= date('F d, Y'); ?></p>
+<section style="padding: 60px 0; background: #f8fafc;">
+    <div class="wrap"
+        style="display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start;">
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">1. Introduction</h4>
-                    <p>Welcome to <strong>AKR Build Tech</strong>. By browsing our website and purchasing our construction materials, AAC Block Jointing Mortar, and infrastructure products, you agree to abide by these Terms & Conditions.</p>
+        <!-- Left Content -->
+        <article
+            style="background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(15,23,42,0.04); border: 1px solid #e2e8f0;">
+            <p style="color:#64748b; margin-bottom: 30px; font-size:14.5px;"><strong>Last Updated:</strong>
+                <?= date('F d, Y'); ?></p>
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">2. Variations in Products</h4>
-                    <p>We deal in industrial construction materials. Minor variations in texture, density, or color may occur between manufacturing batches, which are standard characteristics and not defects.</p>
+            <div class="kyra-article-body" style="color: #334155; font-size: 16.5px; line-height: 1.8;">
+                <p>Welcome to <strong>Kyra Pet Shop</strong>. By engaging with our website, visiting our shop, or
+                    booking a puppy, you agree to abide by the following Terms & Conditions designed to protect both the
+                    pet parents and the animals.</p>
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">3. Pricing and Import Duties</h4>
-                    <p>Domestic prices include applicable taxes unless specified. For international shipments, the buyer is solely responsible for all destination customs duties, import taxes, and local levies.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">1.
+                    Health & Vaccination Guarantee</h3>
+                <p>All puppies sold by Kyra Pet Shop are vet-checked and come with their initial vaccinations (as per
+                    their age). The original vaccination card and health records are handed over to the buyer at the
+                    time of delivery or pickup. It is the buyer's responsibility to continue the vaccination schedule as
+                    advised by their local veterinarian.</p>
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">4. Product Usage Disclaimer</h4>
-                    <p>Information on our website regarding material benefits and specifications is for general informational purposes and should be verified with structural engineers for specific project requirements.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">2.
+                    Lifelong Care Responsibility</h3>
+                <p>Bringing a puppy home is a 10-15 year commitment. By purchasing a pet from us, you agree to provide
+                    proper nutrition, shelter, medical care, and a loving environment. We reserve the right to refuse a
+                    sale if we feel the buyer cannot provide a safe home.</p>
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">5. Governing Law</h4>
-                    <p>Any disputes arising from purchases or website usage shall be governed by the laws of India and subject to local jurisdiction.</p>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">3.
+                    Booking & Availability</h3>
+                <p>Puppies are live animals, and their availability changes rapidly. A puppy is only considered "booked"
+                    or "reserved" once an advance token payment is received. Verbal confirmations do not guarantee
+                    reservation.</p>
 
-                    <h4 class="mt-4" style="font-size: 1.1rem; color: #2b5e2c; font-weight: 600;">6. Contact Information</h4>
-                    <div class="p-3 mt-3 rounded" style="background-color: #f1f5f9; border-left: 4px solid var(--primary-green, #2b5e2c);">
-                        <p class="mb-1"><strong>AKR Build Tech</strong></p>
-                        <p class="mb-1"><strong>Email:</strong> support@akrbuildtech.com</p>
-                        <p class="mb-0"><strong>Phone:</strong> +91-8448211202</p>
-                    </div>
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">4.
+                    Color & Size Variations</h3>
+                <p>Photographs and videos shared are of the exact puppy available. However, please note that as puppies
+                    grow, their coat color, texture, and physical size will naturally change. We provide estimates based
+                    on breed standards, but exact adult size or exact shedding levels cannot be guaranteed.</p>
+
+                <h3 style="color: var(--navy, #0f172a); font-weight: 800; font-size: 22px; margin: 30px 0 15px;">5.
+                    Governing Law</h3>
+                <p>Any disputes arising from purchases or website usage shall be governed by the laws of India and
+                    subject to the jurisdiction of the courts in New Delhi.</p>
+            </div>
+        </article>
+
+        <!-- Right Sidebar -->
+        <aside style="position: sticky; top: 90px; display:flex; flex-direction:column; gap:24px;">
+            <div
+                style="background:#fff; border-radius:20px; padding:24px; border:1px solid #e2e8f0; box-shadow:0 10px 30px rgba(15,23,42,0.04);">
+                <h4
+                    style="font-size:17px; font-weight:800; color:var(--ink); margin:0 0 16px; padding-bottom:12px; border-bottom:2px solid #f1f5f9;">
+                    📍 Quick Links</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <a href="privacy-policy.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Privacy
+                        Policy →</a>
+                    <a href="shipping-return.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Shipping
+                        Policy →</a>
+                    <a href="refund-policy.php"
+                        style="padding:10px 14px; background:#f8fafc; border-radius:10px; color:#334155; text-decoration:none; font-weight:600;">Refund
+                        Policy →</a>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: Sidebar Widgets -->
-            <div class="col-lg-4">
-                <div class="sidebar-widgets position-sticky" style="top: 20px;">
-                    <div class="widget-box bg-white p-4 rounded shadow-sm border mb-4">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">Search Products</h5>
-                        <form action="products.php" method="GET" class="d-flex">
-                            <input type="text" name="search" class="form-control me-2" placeholder="Search..." required style="font-size: 0.9rem;">
-                            <button type="submit" class="btn text-white px-3" style="background: var(--primary-green, #2b5e2c);"><i class="fa-solid fa-magnifying-glass"></i></button>
-                        </form>
-                    </div>
-
-                    <div class="widget-box bg-white p-4 rounded shadow-sm border mb-4">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">Categories</h5>
-                        <ul class="list-unstyled mb-0 category-list">
-                            <?php
-                            $catQuery = mysqli_query($conn, "SELECT * FROM categories WHERE status = 1");
-                            if ($catQuery && mysqli_num_rows($catQuery) > 0) {
-                                while($catRow = mysqli_fetch_assoc($catQuery)) {
-                            ?>
-                            <li class="mb-2 pb-2 border-bottom">
-                                <a href="category.php?slug=<?= htmlspecialchars($catRow['slug_url']) ?>" class="text-decoration-none d-flex justify-content-between align-items-center text-muted" style="font-size: 0.95rem;">
-                                    <span><i class="fa-solid fa-angle-right me-2" style="font-size: 0.75rem;"></i> <?= htmlspecialchars($catRow['categories']) ?></span>
-                                </a>
-                            </li>
-                            <?php 
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-
-                    <div class="widget-box rounded shadow-sm text-center p-4 text-white" style="background: linear-gradient(135deg, var(--primary-green, #2b5e2c) 0%, #1a3f1b 100%);">
-                        <div class="icon-wrap mb-3"><i class="fa-solid fa-headset fs-1 text-white opacity-75"></i></div>
-                        <h4 class="fw-bold mb-2 text-white">Wholesale Inquiries</h4>
-                        <p class="small mb-4 opacity-75">Get in touch for bulk orders and export pricing.</p>
-                        <a href="contact.php" class="btn bg-white w-100 fw-bold shadow-sm mb-3" style="color: var(--primary-green, #2b5e2c);">Request Quote</a>
-                        <a href="tel:+918448211202" class="text-white text-decoration-none small fw-bold"><i class="fa-solid fa-phone me-1"></i> +91-8448211202</a>
-                    </div>
-                </div>
+            <div
+                style="background:linear-gradient(145deg, var(--navy, #0f172a) 0%, #1e293b 100%); border-radius:20px; padding:28px 24px; color:#fff; text-align:center;">
+                <h4 style="color:#fff; font-size:18px; font-weight:800; margin-bottom:10px;">Visit Us Before Buying</h4>
+                <p style="color:#cbd5e1; font-size:14px; margin-bottom:20px;">We encourage all families to visit our
+                    Patel Nagar store, check the records, and meet the puppy before making a decision.</p>
+                <a href="contact.php" class="btn btn-teal" style="width:100%; justify-content:center;">Get
+                    Directions</a>
             </div>
+        </aside>
 
-        </div>
     </div>
 </section>
 
-<?php 
-include ('includes/inquiry-form.php');
-include 'includes/footer.php'; 
-?>
+<?php require __DIR__ . '/includes/footer.php'; ?>
