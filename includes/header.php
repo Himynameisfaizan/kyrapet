@@ -6,20 +6,14 @@ include_once 'includes/config.php';
 // Har page ka naam automatically nikalna (jaise 'contact.php', 'about.php')
 $current_page_url = basename($_SERVER['PHP_SELF']);
 
-// 1. DYNAMIC META FETCHING (Sirf tab fetch karega jab page ne apna specific SEO set na kiya ho)
+// 1. DYNAMIC META FETCHING 
 if (empty($title) || empty($desc)) {
     $meta_q = mysqli_query($conn, "SELECT * FROM meta WHERE page_url='$current_page_url' LIMIT 1");
     if ($meta_q && mysqli_num_rows($meta_q) > 0) {
         $meta_data = mysqli_fetch_assoc($meta_q);
-        if (empty($title)) {
-            $title = $meta_data['meta_title'];
-        }
-        if (empty($desc)) {
-            $desc = $meta_data['meta_desc'];
-        }
-        if (empty($meta_key)) {
-            $meta_key = $meta_data['meta_key'] ?? '';
-        }
+        if (empty($title)) { $title = $meta_data['meta_title']; }
+        if (empty($desc)) { $desc = $meta_data['meta_desc']; }
+        if (empty($meta_key)) { $meta_key = $meta_data['meta_key'] ?? ''; }
     }
 }
 
@@ -33,12 +27,15 @@ if (empty($schema_markup)) {
 }
 
 // Default Fallback agar database mein bhi kuch na ho
-if (empty($title)) {
-    $title = 'Kyra Pet Shop | Healthy Puppies in New Delhi';
-}
-if (empty($desc)) {
-    $desc = 'Premium pure breed puppies in New Delhi. Vet checked, 100% vaccinated. Visit Kyra Pet Shop.';
-}
+if (empty($title)) { $title = 'Kyra Pet Shop | Healthy Puppies in New Delhi'; }
+if (empty($desc)) { $desc = 'Premium pure breed puppies in New Delhi. Vet checked, 100% vaccinated. Visit Kyra Pet Shop.'; }
+
+// 3. DYNAMIC CANONICAL URL GENERATION
+// Protocol check (http or https)
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+// Host and clean path (strtok '?' query parameters hata deta hai clean SEO URL ke liye)
+$clean_path = strtok($_SERVER['REQUEST_URI'], '?');
+$canonical_url = $protocol . $_SERVER['HTTP_HOST'] . $clean_path;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,8 +44,11 @@ if (empty($desc)) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- YEH LINE SABSE ZAROORI HAI: CSS aur Images ke path theek karne ke liye -->
+    <!-- CSS aur Images ke path theek karne ke liye -->
     <base href="/projects/kyrapet/">
+
+    <!-- DYNAMIC CANONICAL TAG -->
+    <link rel="canonical" href="<?= htmlspecialchars($canonical_url) ?>" />
 
     <!-- DYNAMIC SEO TAGS -->
     <title><?= htmlspecialchars($title) ?></title>
@@ -92,20 +92,20 @@ if (empty($desc)) {
                     <button class="dd-toggle<?= !empty($aboutGroup) ? ' active' : '' ?>" aria-expanded="false"
                         aria-haspopup="true">About Us</button>
                     <div class="dd">
-                        <a class="<?= isset($a) && is_callable($a) ? $a('about') : '' ?>" href="about.php">About
+                        <a class="<?= isset($a) && is_callable($a) ? $a('about') : '' ?>" href="about">About
                             Us<small>Our story and values</small></a>
-                        <a class="<?= isset($a) && is_callable($a) ? $a('how') : '' ?>" href="how-it-works.php">How It
+                        <a class="<?= isset($a) && is_callable($a) ? $a('how') : '' ?>" href="how-it-works">How It
                             Works<small>From first hello to puppy
                                 at home</small></a>
                         <a class="<?= isset($a) && is_callable($a) ? $a('reviews') : '' ?>"
-                            href="reviews.php">Reviews<small>Google reviews and video
+                            href="reviews">Reviews<small>Google reviews and video
                                 stories</small></a>
                     </div>
                 </div>
-                <a class="<?= isset($a) && is_callable($a) ? $a('breeds') : '' ?>" href="breeds.php">Breeds</a>
-                <a class="<?= isset($a) && is_callable($a) ? $a('gallery') : '' ?>" href="gallery.php">Gallery</a>
-                <a class="<?= isset($a) && is_callable($a) ? $a('blog') : '' ?>" href="blog.php">Blog</a>
-                <a class="<?= isset($a) && is_callable($a) ? $a('contact') : '' ?>" href="contact.php">Contact</a>
+                <a class="<?= isset($a) && is_callable($a) ? $a('breeds') : '' ?>" href="breeds">Breeds</a>
+                <a class="<?= isset($a) && is_callable($a) ? $a('gallery') : '' ?>" href="gallery">Gallery</a>
+                <a class="<?= isset($a) && is_callable($a) ? $a('blog') : '' ?>" href="blog">Blog</a>
+                <a class="<?= isset($a) && is_callable($a) ? $a('contact') : '' ?>" href="contact">Contact</a>
                 <a class="btn btn-teal" href="tel:<?= h($tel ?? '') ?>">Call now</a>
             </nav>
         </div>
