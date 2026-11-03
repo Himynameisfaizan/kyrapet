@@ -1,6 +1,6 @@
 <?php
-require __DIR__.'/config/connect.php'; 
-require __DIR__.'/includes/config.php';
+require __DIR__ . '/config/connect.php';
+require __DIR__ . '/includes/config.php';
 
 $page = 'breeds';
 
@@ -31,8 +31,8 @@ if ($schema_q && mysqli_num_rows($schema_q) > 0) {
 // ==========================================
 $breedNames = [];
 $breed_q = mysqli_query($conn, "SELECT DISTINCT brand_name FROM products WHERE status=1 AND brand_name IS NOT NULL AND brand_name != ''");
-if($breed_q) {
-    while($b_row = mysqli_fetch_assoc($breed_q)){
+if ($breed_q) {
+    while ($b_row = mysqli_fetch_assoc($breed_q)) {
         $breedNames[] = $b_row['brand_name'];
     }
 }
@@ -40,11 +40,10 @@ if($breed_q) {
 // ==========================================
 // 3. PAGINATION & FILTER LOGIC
 // ==========================================
-$limit = 12; 
+$limit = 12;
 $current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($current_page - 1) * $limit;
 
-// Fixed: Purani hardcoded pro_cate=34158 hata di hai taaki saari categories ke products show ho sakein
 $where = ["status=1"];
 
 // Search Box Filter
@@ -60,7 +59,7 @@ if (!empty($_GET['breed'])) {
 }
 
 // Sorting Logic
-$order_by = "ORDER BY id DESC"; // Default: Featured (Latest)
+$order_by = "ORDER BY id DESC";
 if (isset($_GET['sort']) && $_GET['sort'] == 'az') {
     $order_by = "ORDER BY pro_name ASC";
 }
@@ -75,7 +74,7 @@ if ($count_q) {
 }
 $total_pages = ceil($total_rows / $limit);
 
-// Fetch Products from Database - Array renamed to $db_dogs to prevent overwrite
+// Fetch Products from Database
 $db_dogs = [];
 $prod_q = mysqli_query($conn, "SELECT * FROM products WHERE $where_sql $order_by LIMIT $offset, $limit");
 if ($prod_q) {
@@ -84,7 +83,7 @@ if ($prod_q) {
             'slug'   => $row['slug_url'],
             'name'   => $row['pro_name'],
             'breed'  => $row['brand_name'] ?? 'Dog',
-            'gender' => !empty($row['gender']) ? $row['gender'] : 'Male/Female', 
+            'gender' => !empty($row['gender']) ? $row['gender'] : 'Male/Female',
             'age'    => !empty($row['age']) ? $row['age'] : '8 Weeks',
             'img'    => !empty($row['pro_img']) ? 'admin/assets/img/uploads/' . $row['pro_img'] : null,
             'n'      => $row['id']
@@ -92,15 +91,15 @@ if ($prod_q) {
     }
 }
 
-require __DIR__.'/includes/header.php';
-if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, vaccinated and raised with care. Pick a puppy and message us on WhatsApp.');
+require __DIR__ . '/includes/header.php';
+if (function_exists('banner')) banner('Our Premium Breeds', 'Breeds', 'Healthy, vaccinated and raised with care. Pick a puppy and message us on WhatsApp.');
 ?>
 <main>
     <section style="padding-top:30px">
         <div class="wrap">
 
-            <!-- DYNAMIC SEARCH & FILTER FORM -->
-            <form id="filterForm" method="GET" action="breeds.php">
+            <!-- DYNAMIC SEARCH & FILTER FORM (Action fixed to 'breeds') -->
+            <form id="filterForm" method="GET" action="breeds">
                 <div class="tools">
                     <div class="sbox">
                         <input name="search" id="q" type="search" placeholder="Search breed or name..."
@@ -127,36 +126,31 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
                         </select>
                     </div>
                 </div>
-                <!-- Hidden input to track breed selection -->
                 <input type="hidden" name="breed" id="breedInput" value="<?= h($_GET['breed'] ?? '') ?>">
             </form>
 
-            <!-- DYNAMIC CATEGORIES (BREEDS) -->
             <div class="fchips" role="group" aria-label="Filter by breed">
                 <button type="button" class="<?= empty($_GET['breed']) ? 'active' : '' ?>"
                     onclick="document.getElementById('breedInput').value=''; document.getElementById('filterForm').submit();">All
                     breeds</button>
-                <?php foreach($breedNames as $b): ?>
+                <?php foreach ($breedNames as $b): ?>
                 <button type="button" class="<?= (isset($_GET['breed']) && $_GET['breed'] == $b) ? 'active' : '' ?>"
                     onclick="document.getElementById('breedInput').value='<?= h($b) ?>'; document.getElementById('filterForm').submit();"><?= h($b) ?></button>
                 <?php endforeach; ?>
             </div>
 
-            <!-- RESULT COUNT -->
             <div class="count" id="cnt">Showing <?= count($db_dogs) ?> of <?= $total_rows ?> puppies</div>
 
-            <!-- PRODUCTS GRID USING $db_dogs -->
             <div class="grid4" id="grid">
-                <?php 
+                <?php
                 if (!empty($db_dogs)) {
-                    foreach($db_dogs as $d) {
-                        if (function_exists('dog_card')) dog_card($d, $site); 
+                    foreach ($db_dogs as $d) {
+                        if (function_exists('dog_card')) dog_card($d, $site);
                     }
-                } 
+                }
                 ?>
             </div>
 
-            <!-- EMPTY STATE -->
             <?php if (empty($db_dogs)): ?>
             <div class="empty" id="empty" style="display:block;">
                 <b>No puppies match your search</b><br>
@@ -164,7 +158,7 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
             </div>
             <?php endif; ?>
 
-            <!-- DYNAMIC PAGINATION -->
+            <!-- DYNAMIC PAGINATION (HREF & STYLING FIXED) -->
             <?php if ($total_pages > 1): ?>
             <div class="pagination"
                 style="display: flex; justify-content: center; gap: 10px; margin-top: 40px; flex-wrap: wrap;">
@@ -173,9 +167,15 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
                     $query = $_GET;
                     $query['page'] = $i;
                     $query_string = http_build_query($query);
+                    $isActive = ($current_page == $i);
+                    $bg = $isActive ? 'var(--teal, #0d9488)' : '#ffffff';
+                    $color = $isActive ? '#ffffff' : 'var(--teal, #0d9488)';
+                    $border = '2px solid var(--teal, #0d9488)';
                 ?>
-                <a href="?<?= $query_string ?>" class="btn <?= ($current_page == $i) ? 'btn-teal' : 'btn-line' ?>"
-                    style="padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+                <a href="breeds?<?= $query_string ?>"
+                    style="display:flex; align-items:center; justify-content:center; min-width:42px; height:42px; padding:0 15px; border-radius:8px; font-weight:700; text-decoration:none; transition:0.3s; background:<?= $bg ?>; color:<?= $color ?>; border:<?= $border ?>;"
+                    onmouseover="this.style.background='var(--teal, #0d9488)'; this.style.color='#ffffff';"
+                    onmouseout="this.style.background='<?= $bg ?>'; this.style.color='<?= $color ?>';">
                     <?= $i ?>
                 </a>
                 <?php endfor; ?>
@@ -189,11 +189,11 @@ if (function_exists('banner')) banner('Our Premium Breeds','Breeds','Healthy, va
                         soon as we have a match.</p>
                 </div>
                 <div class="cta" style="margin:0"><a class="btn btn-teal" target="_blank" rel="noopener"
-                        href="https://wa.me/<?=h($site['wa'] ?? '')?>?text=<?=rawurlencode('Hi Kyra Pet Shop, I am looking for a specific breed.')?>">Ask
-                        on WhatsApp</a><a class="btn btn-line" href="tel:<?=h($tel ?? '')?>">Call us</a></div>
+                        href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, I am looking for a specific breed.') ?>">Ask
+                        on WhatsApp</a><a class="btn btn-line" href="tel:<?= h($tel ?? '') ?>">Call us</a></div>
             </div>
         </div>
     </section>
-    <?php if(function_exists('cta_band')) cta_band(); ?>
+    <?php if (function_exists('cta_band')) cta_band(); ?>
 </main>
-<?php require __DIR__.'/includes/footer.php'; ?>
+<?php require __DIR__ . '/includes/footer.php'; ?>
