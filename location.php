@@ -345,7 +345,7 @@ if (function_exists('banner')) {
                         $readMins  = max(2, (int)ceil($wordCount / 200));
 
                         $slug    = trim((string)($cp['slug_url'] ?? ''));
-                        $pageUrl = 'page.php?slug=' . rawurlencode($slug);
+                        $pageUrl = 'page/' . rawurlencode($slug);
                     ?>
                 <a href="<?= h($pageUrl) ?>" class="loc-card rv"
                     data-search="<?= h(strtolower($cardTitle . ' ' . $badgeText . ' ' . $description)) ?>">

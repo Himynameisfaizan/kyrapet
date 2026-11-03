@@ -636,7 +636,7 @@ require __DIR__ . '/includes/header.php';
             <div class="chips rv"><span>Also available:</span><?php if (!empty($more)) foreach ($more as $m): ?><a
                     href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, do you have ' . $m . ' puppies?') ?>"
                     target="_blank" rel="noopener"><?= h($m) ?></a><?php endforeach; ?></div>
-            <div class="center"><a class="btn btn-navy" href="breeds.php">View all breeds</a></div>
+            <div class="center"><a class="btn btn-navy" href="breeds">View all breeds</a></div>
         </div>
     </section>
 
@@ -719,7 +719,7 @@ require __DIR__ . '/includes/header.php';
             </div>
             <div class="arrows"><button class="arr" id="rprev" aria-label="Previous reviews">←</button><button
                     class="arr" id="rnext" aria-label="Next reviews">→</button></div>
-            <div class="center"><a class="btn btn-navy" href="reviews.php">Read all reviews</a></div>
+            <div class="center"><a class="btn btn-navy" href="reviews">Read all reviews</a></div>
         </div>
     </section>
 
@@ -759,7 +759,7 @@ require __DIR__ . '/includes/header.php';
                                 <?= h($site['owner'] ?? 'Mr. Nitin') ?> and team.</span></div>
                     </li>
                 </ul>
-                <div class="cta" style="margin:0"><a class="btn btn-teal" href="about.php">Read our story</a><a
+                <div class="cta" style="margin:0"><a class="btn btn-teal" href="about">Read our story</a><a
                         class="btn btn-navy" href="#contact">Talk to our team</a></div>
             </div>
         </div>
@@ -783,7 +783,7 @@ require __DIR__ . '/includes/header.php';
                 </a>
                 <?php endforeach; ?>
             </div>
-            <div class="center"><a class="btn btn-teal" href="gallery.php">View full gallery</a> &nbsp; <a
+            <div class="center"><a class="btn btn-teal" href="gallery">View full gallery</a> &nbsp; <a
                     class="btn btn-navy" href="<?= h($site['insta'] ?? '') ?>" target="_blank" rel="noopener">Follow us
                     on Instagram</a></div>
         </div>
@@ -825,7 +825,7 @@ require __DIR__ . '/includes/header.php';
                     <h3><?= h($s[0]) ?></h3>
                     <p><?= h($s[1]) ?></p>
                 </div><?php endforeach; ?></div>
-            <div class="center"><a class="btn btn-teal" href="how-it-works.php">See the full process</a></div>
+            <div class="center"><a class="btn btn-teal" href="how-it-works">See the full process</a></div>
         </div>
     </section>
 
@@ -949,7 +949,7 @@ require __DIR__ . '/includes/header.php';
         ?>
             </div>
             <div class="center">
-                <a class="btn btn-navy" href="blog.php">Read all articles</a>
+                <a class="btn btn-navy" href="blog">Read all articles</a>
             </div>
         </div>
     </section>

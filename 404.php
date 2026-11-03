@@ -158,19 +158,20 @@ require_once __DIR__ . '/includes/header.php';
 
                 <!-- Primary CTA Buttons -->
                 <div class="err404-actions">
-                    <a href="index.php" class="btn btn-navy">← Back to Home</a>
-                    <a href="breeds.php" class="btn btn-teal">Browse All Puppies</a>
+                    <a href="./" class="btn btn-navy">← Back to Home</a>
+                    <a href="breeds" class="btn btn-teal">Browse All Puppies</a>
+
                     <a href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, I need help finding a puppy.') ?>"
-                        target="_blank" rel="noopener" class="btn btn-line">Chat on WhatsApp</a>
+                        target="_blank" rel="noopener" class="btn btn-navy">Chat on WhatsApp</a>
                 </div>
 
                 <!-- Helpful Quick Links -->
                 <div class="err404-links">
-                    <a href="about.php">About Us</a>
-                    <a href="location.php">Locations &amp; Guides</a>
-                    <a href="gallery.php">Puppy Gallery</a>
-                    <a href="reviews.php">Customer Reviews</a>
-                    <a href="contact.php">Contact Us</a>
+                    <a href="about">About Us</a>
+                    <a href="location">Locations &amp; Guides</a>
+                    <a href="gallery">Puppy Gallery</a>
+                    <a href="reviews">Customer Reviews</a>
+                    <a href="contact">Contact Us</a>
                 </div>
             </div>
         </div>

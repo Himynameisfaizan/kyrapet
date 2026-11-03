@@ -179,42 +179,66 @@ $gal = [
 
 /* ================= HELPERS ================= */
 if (!function_exists('dog_card')) {
-function dog_card($d,$site){ $t=rawurlencode("Hi Kyra Pet Shop, I am interested in: ".$d['name']); $u='breed.php?slug='.urlencode($d['slug']); ?>
-<article class="card pitem rv" data-cat="<?=h($d['breed'])?>" data-gender="<?=h($d['gender'])?>" data-text="<?=h(strtolower($d['name'].' '.$d['breed']))?>" data-order="<?=(int)$d['n']?>">
-  <a class="im" href="<?=$u?>"><?php if($d['img']): ?><img src="<?=h(strpos($d['img'],'/')!==false?$d['img']:ph($d['img'],700))?>" alt="<?=h($d['name'])?>" loading="lazy"><?php else: ?><span class="noimg"><b>🐾</b><?=h($d['breed'])?></span><?php endif; ?><span class="ok">✓ Vaccinated</span></a>
-  <div class="bd"><h3><a href="<?=$u?>"><?=h($d['name'])?></a></h3><div class="meta"><?=h($d['age'])?> &nbsp;|&nbsp; <?=h($d['gender'])?> &nbsp;|&nbsp; <?=h($d['breed'])?></div>
-    <div class="row"><a class="btn" href="<?=$u?>">Details</a><a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/<?=h($site['wa'])?>?text=<?=$t?>">Inquire</a></div></div>
+function dog_card($d,$site){ $t=rawurlencode("Hi Kyra Pet Shop, I am interested in: ".$d['name']); $u='breed/'.urlencode($d['slug']); ?>
+<article class="card pitem rv" data-cat="<?=h($d['breed'])?>" data-gender="<?=h($d['gender'])?>"
+    data-text="<?=h(strtolower($d['name'].' '.$d['breed']))?>" data-order="<?=(int)$d['n']?>">
+    <a class="im" href="<?=$u?>"><?php if($d['img']): ?><img
+            src="<?=h(strpos($d['img'],'/')!==false?$d['img']:ph($d['img'],700))?>" alt="<?=h($d['name'])?>"
+            loading="lazy"><?php else: ?><span class="noimg"><b>🐾</b><?=h($d['breed'])?></span><?php endif; ?><span
+            class="ok">✓ Vaccinated</span></a>
+    <div class="bd">
+        <h3><a href="<?=$u?>"><?=h($d['name'])?></a></h3>
+        <div class="meta"><?=h($d['age'])?> &nbsp;|&nbsp; <?=h($d['gender'])?> &nbsp;|&nbsp; <?=h($d['breed'])?></div>
+        <div class="row"><a class="btn" href="<?=$u?>">Details</a><a class="btn btn-wa" target="_blank" rel="noopener"
+                href="https://wa.me/<?=h($site['wa'])?>?text=<?=$t?>">Inquire</a></div>
+    </div>
 </article><?php }
 }
 
 if (!function_exists('blog_card')) {
-    function blog_card($b){ $u='blog-post.php?slug='.urlencode($b['slug']); ?>
-    <article class="bcard rv" data-cat="<?=h($b['cat'])?>">
-      <a class="bim" href="<?=$u?>">
-        <img src="<?=h(strpos($b['img'],'/')!==false ? $b['img'] : ph($b['img'],700))?>" alt="<?=h($b['title'])?>" loading="lazy">
+    function blog_card($b){ $u='blog-post/'.urlencode($b['slug']); ?>
+<article class="bcard rv" data-cat="<?=h($b['cat'])?>">
+    <a class="bim" href="<?=$u?>">
+        <img src="<?=h(strpos($b['img'],'/')!==false ? $b['img'] : ph($b['img'],700))?>" alt="<?=h($b['title'])?>"
+            loading="lazy">
         <span class="bc"><?=h($b['cat'])?></span>
-      </a>
-      <div class="bb">
+    </a>
+    <div class="bb">
         <div class="bmeta"><?=h($b['date'])?> · <?=h($b['read'])?></div>
         <h3><a href="<?=$u?>"><?=h($b['title'])?></a></h3>
         <p><?=h($b['excerpt'])?></p>
         <a class="more" href="<?=$u?>">Read article →</a>
-      </div>
-    </article><?php }
+    </div>
+</article><?php }
 }
 
 if (!function_exists('banner')) {
 function banner($h1,$crumb,$sub=''){ ?>
-<section class="pbanner"><div class="blob b1"></div><div class="blob b2"></div>
-  <?php for($k=0;$k<7;$k++): ?><span class="paw" style="left:<?=($k*14+8)%96?>%;animation-delay:<?=$k*1.6?>s;font-size:<?=16+($k%3)*8?>px">🐾</span><?php endfor; ?>
-  <div class="wrap"><nav class="crumb" aria-label="Breadcrumb"><a href="index.php">Home</a><span>/</span><b><?=h($crumb)?></b></nav>
-    <h1 class="split"><?=h($h1)?></h1><?php if($sub): ?><p class="seq"><?=h($sub)?></p><?php endif; ?></div></section><?php }
+<section class="pbanner">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <?php for($k=0;$k<7;$k++): ?><span class="paw"
+        style="left:<?=($k*14+8)%96?>%;animation-delay:<?=$k*1.6?>s;font-size:<?=16+($k%3)*8?>px">🐾</span><?php endfor; ?>
+    <div class="wrap">
+        <nav class="crumb" aria-label="Breadcrumb"><a href="index.php">Home</a><span>/</span><b><?=h($crumb)?></b></nav>
+        <h1 class="split"><?=h($h1)?></h1><?php if($sub): ?><p class="seq"><?=h($sub)?></p><?php endif; ?>
+    </div>
+</section><?php }
 }
 
 if (!function_exists('cta_band')) {
 function cta_band($title='Ready to meet your new best friend?',$text=''){ global $site; ?>
-<div class="band"><div class="wrap"><div class="in rv">
-  <div><h2><?=h($title)?></h2><p><?=h($text?:'Visit us '.$site['hours'].' or message us on WhatsApp.')?></p></div>
-  <a class="btn" target="_blank" rel="noopener" href="https://wa.me/<?=h($site['wa'])?>?text=<?=rawurlencode('Hi Kyra Pet Shop, I would like to visit and see the puppies.')?>">Chat on WhatsApp</a>
-</div></div></div><?php }
+<div class="band">
+    <div class="wrap">
+        <div class="in rv">
+            <div>
+                <h2><?=h($title)?></h2>
+                <p><?=h($text?:'Visit us '.$site['hours'].' or message us on WhatsApp.')?></p>
+            </div>
+            <a class="btn" target="_blank" rel="noopener"
+                href="https://wa.me/<?=h($site['wa'])?>?text=<?=rawurlencode('Hi Kyra Pet Shop, I would like to visit and see the puppies.')?>">Chat
+                on WhatsApp</a>
+        </div>
+    </div>
+</div><?php }
 }
