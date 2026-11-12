@@ -328,6 +328,63 @@ require __DIR__ . '/includes/header.php';
 
     <!-- OUR HAPPY CUSTOMERS (Larger & More Attractive Cards + Video Grid Fixes) -->
     <style>
+    /* ================= MOBILE HORIZONTAL SCROLL & SHAKE FIX ================= */
+    html,
+    body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        position: relative;
+    }
+
+    main#home,
+    main#home>section,
+    .marq,
+    .stats,
+    .band {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+    }
+
+    /* Grid items aur animations ko screen se bahar jane se rokne ke liye */
+    .hero .wrap>*,
+    .hero-slide-pane>*,
+    .about .wrap>*,
+    .videos .wrap>*,
+    .duo>*,
+    .cbox>*,
+    .rhead>* {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* Mobile par animation की wajah se layout shift na ho */
+    @media (max-width: 768px) {
+
+        [data-anim="left"],
+        [data-anim="right"] {
+            transform: translateY(24px) !important;
+        }
+
+        [data-anim="left"].in,
+        [data-anim="right"].in,
+        .rv.in,
+        .rv.show {
+            transform: translate(0, 0) !important;
+        }
+
+        .panel table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .cbox iframe {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+
     .hc-wrapper {
         padding: 85px 0;
         background: var(--bg-alt, #f8f9fa);
