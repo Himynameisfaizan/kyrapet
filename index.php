@@ -22,7 +22,8 @@ $limit_forever_homes    = 6; // "Where our puppies go next" mein kitni videos di
 $limit_customer_stories = 3; // "Customer stories (Real families...)" mein kitni videos dikhani hain
 $limit_ask_them         = 3; // "Ask them, not us" mein kitni videos dikhani hain
 
-function getCleanYoutubeCode($code, $url = '') {
+function getCleanYoutubeCode($code, $url = '')
+{
     $code = trim($code ?? '');
     if ($code !== '' && strlen($code) === 11) return $code;
     $check = trim($url ?: $code);
@@ -55,17 +56,17 @@ $about = mysqli_fetch_assoc($about_q);
 $db_dogs = [];
 $prod_q = mysqli_query($conn, "SELECT * FROM products WHERE status=1 ORDER BY id DESC LIMIT 8");
 if ($prod_q) {
-  while ($row = mysqli_fetch_assoc($prod_q)) {
-    $db_dogs[] = [
-      'slug'   => $row['slug_url'],
-      'name'   => $row['pro_name'],
-      'breed'  => $row['brand_name'] ?? 'Dog',
-      'gender' => !empty($row['gender']) ? $row['gender'] : 'Male/Female',
-      'age'    => !empty($row['age']) ? $row['age'] : '8 Weeks',
-      'img'    => !empty($row['pro_img']) ? 'admin/assets/img/uploads/' . $row['pro_img'] : null,
-      'n'      => $row['id']
-    ];
-  }
+    while ($row = mysqli_fetch_assoc($prod_q)) {
+        $db_dogs[] = [
+            'slug'   => $row['slug_url'],
+            'name'   => $row['pro_name'],
+            'breed'  => $row['brand_name'] ?? 'Dog',
+            'gender' => !empty($row['gender']) ? $row['gender'] : 'Male/Female',
+            'age'    => !empty($row['age']) ? $row['age'] : '8 Weeks',
+            'img'    => !empty($row['pro_img']) ? 'admin/assets/img/uploads/' . $row['pro_img'] : null,
+            'n'      => $row['id']
+        ];
+    }
 }
 
 // Dynamic Videos Fetching with Smart Auto-Fill & Custom Limits
@@ -76,52 +77,52 @@ $all_db_videos = [];
 
 $vid_q = mysqli_query($conn, "SELECT * FROM videos WHERE status = 1 ORDER BY video_id DESC");
 if ($vid_q) {
-  while ($row = mysqli_fetch_assoc($vid_q)) {
-    $v_code = trim($row['video_code'] ?? '');
-    if ($v_code === '' && !empty($row['youtube_url'])) {
-      if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $row['youtube_url'], $m)) {
-        $v_code = $m[1];
-      }
-    }
-    if ($v_code === '') continue;
+    while ($row = mysqli_fetch_assoc($vid_q)) {
+        $v_code = trim($row['video_code'] ?? '');
+        if ($v_code === '' && !empty($row['youtube_url'])) {
+            if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $row['youtube_url'], $m)) {
+                $v_code = $m[1];
+            }
+        }
+        if ($v_code === '') continue;
 
-    $vid_item = [$v_code, !empty($row['title']) ? $row['title'] : 'Happy Pet Parent'];
-    $all_db_videos[] = $vid_item;
+        $vid_item = [$v_code, !empty($row['title']) ? $row['title'] : 'Happy Pet Parent'];
+        $all_db_videos[] = $vid_item;
 
-    $sec_type = trim($row['section_type'] ?? '');
-    if ($sec_type === 'customer_stories') {
-      $db_v1[] = $vid_item;
-    } elseif ($sec_type === 'forever_homes') {
-      $db_v2[] = $vid_item;
-    } elseif ($sec_type === 'ask_them') {
-      $db_v3[] = $vid_item;
+        $sec_type = trim($row['section_type'] ?? '');
+        if ($sec_type === 'customer_stories') {
+            $db_v1[] = $vid_item;
+        } elseif ($sec_type === 'forever_homes') {
+            $db_v2[] = $vid_item;
+        } elseif ($sec_type === 'ask_them') {
+            $db_v3[] = $vid_item;
+        }
     }
-  }
 }
 
 // Smart Auto-Fill: Agar kisi section mein limit se kam videos tagged hain, toh DB ki baaki videos se pura karein
 if (!empty($all_db_videos)) {
-  // 1. Fill Forever Homes ($db_v2) up to $limit_forever_homes (6)
-  foreach ($all_db_videos as $av) {
-    if (count($db_v2) >= $limit_forever_homes) break;
-    if (!in_array($av[0], array_column($db_v2, 0))) {
-      $db_v2[] = $av;
+    // 1. Fill Forever Homes ($db_v2) up to $limit_forever_homes (6)
+    foreach ($all_db_videos as $av) {
+        if (count($db_v2) >= $limit_forever_homes) break;
+        if (!in_array($av[0], array_column($db_v2, 0))) {
+            $db_v2[] = $av;
+        }
     }
-  }
-  // 2. Fill Customer Stories ($db_v1) up to $limit_customer_stories (3)
-  foreach ($all_db_videos as $av) {
-    if (count($db_v1) >= $limit_customer_stories) break;
-    if (!in_array($av[0], array_column($db_v1, 0))) {
-      $db_v1[] = $av;
+    // 2. Fill Customer Stories ($db_v1) up to $limit_customer_stories (3)
+    foreach ($all_db_videos as $av) {
+        if (count($db_v1) >= $limit_customer_stories) break;
+        if (!in_array($av[0], array_column($db_v1, 0))) {
+            $db_v1[] = $av;
+        }
     }
-  }
-  // 3. Fill Ask Them ($db_v3) up to $limit_ask_them (3)
-  foreach (array_reverse($all_db_videos) as $av) {
-    if (count($db_v3) >= $limit_ask_them) break;
-    if (!in_array($av[0], array_column($db_v3, 0))) {
-      $db_v3[] = $av;
+    // 3. Fill Ask Them ($db_v3) up to $limit_ask_them (3)
+    foreach (array_reverse($all_db_videos) as $av) {
+        if (count($db_v3) >= $limit_ask_them) break;
+        if (!in_array($av[0], array_column($db_v3, 0))) {
+            $db_v3[] = $av;
+        }
     }
-  }
 }
 
 // Apply exact limits set at top
@@ -135,38 +136,38 @@ $colors = ['#4a90e2', '#e91e63', '#4caf50', '#ff9800', '#9c27b0'];
 $color_i = 0;
 $rev_q = mysqli_query($conn, "SELECT * FROM testimonials WHERE status=1 ORDER BY test_id DESC");
 if ($rev_q) {
-  while ($row = mysqli_fetch_assoc($rev_q)) {
-    $db_reviews[] = [$row['name'], $row['designation'], date('M Y', strtotime($row['created_at'])), 5, '', $row['message'], $colors[$color_i % count($colors)]];
-    $color_i++;
-  }
+    while ($row = mysqli_fetch_assoc($rev_q)) {
+        $db_reviews[] = [$row['name'], $row['designation'], date('M Y', strtotime($row['created_at'])), 5, '', $row['message'], $colors[$color_i % count($colors)]];
+        $color_i++;
+    }
 }
 
 // Gallery Section
 $db_gallery = [];
 $gal_q = mysqli_query($conn, "SELECT * FROM gallery ORDER BY ID DESC LIMIT 8");
 if ($gal_q) {
-  while ($row = mysqli_fetch_assoc($gal_q)) {
-    $db_gallery[] = 'admin/' . ltrim($row['image_path'], '/');
-  }
+    while ($row = mysqli_fetch_assoc($gal_q)) {
+        $db_gallery[] = 'admin/' . ltrim($row['image_path'], '/');
+    }
 }
 
 // Blog Section
 $db_blog = [];
 $blog_q = mysqli_query($conn, "SELECT * FROM blogs WHERE status=1 ORDER BY created_at DESC LIMIT 3");
 if ($blog_q) {
-  while ($row = mysqli_fetch_assoc($blog_q)) {
-    $desc_text = strip_tags($row['description']);
-    $excerpt = mb_substr($desc_text, 0, 100) . '...';
-    $db_blog[] = [
-      'slug'    => $row['slug'],
-      'title'   => $row['title'],
-      'cat'     => 'Pet Care',
-      'date'    => date('M d, Y', strtotime($row['created_at'])),
-      'read'    => '5 min read',
-      'img'     => 'admin/assets/img/uploads/blogs/' . $row['image'],
-      'excerpt' => $excerpt
-    ];
-  }
+    while ($row = mysqli_fetch_assoc($blog_q)) {
+        $desc_text = strip_tags($row['description']);
+        $excerpt = mb_substr($desc_text, 0, 100) . '...';
+        $db_blog[] = [
+            'slug'    => $row['slug'],
+            'title'   => $row['title'],
+            'cat'     => 'Pet Care',
+            'date'    => date('M d, Y', strtotime($row['created_at'])),
+            'read'    => '5 min read',
+            'img'     => 'admin/assets/img/uploads/blogs/' . $row['image'],
+            'excerpt' => $excerpt
+        ];
+    }
 }
 
 // Contact & Map Data
@@ -178,22 +179,22 @@ $contact = mysqli_fetch_assoc($contact_q);
 // ==========================================
 $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['website'])) {
-  $n = trim(strip_tags($_POST['name'] ?? ''));
-  $p = trim(strip_tags($_POST['phone'] ?? ''));
-  $b = trim(strip_tags($_POST['breed'] ?? ''));
-  $m = trim(strip_tags($_POST['message'] ?? ''));
-  $e = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL) ?: '';
+    $n = trim(strip_tags($_POST['name'] ?? ''));
+    $p = trim(strip_tags($_POST['phone'] ?? ''));
+    $b = trim(strip_tags($_POST['breed'] ?? ''));
+    $m = trim(strip_tags($_POST['message'] ?? ''));
+    $e = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL) ?: '';
 
-  if ($n && preg_match('/^[0-9+\s-]{8,15}$/', $p)) {
-    $stmt = $conn->prepare("INSERT INTO inquiries (name, phone, email, subject, message) VALUES (?, ?, ?, ?, ?)");
-    $subj = "New Inquiry for Breed: " . $b;
-    $stmt->bind_param("sssss", $n, $p, $e, $subj, $m);
-    $stmt->execute();
-    @mail($site['email'], 'New inquiry from website', "Name: $n\nPhone: $p\nEmail: $e\nBreed: $b\nMessage: $m", "From: no-reply@" . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
-    $msg = 'ok';
-  } else {
-    $msg = 'err';
-  }
+    if ($n && preg_match('/^[0-9+\s-]{8,15}$/', $p)) {
+        $stmt = $conn->prepare("INSERT INTO inquiries (name, phone, email, subject, message) VALUES (?, ?, ?, ?, ?)");
+        $subj = "New Inquiry for Breed: " . $b;
+        $stmt->bind_param("sssss", $n, $p, $e, $subj, $m);
+        $stmt->execute();
+        @mail($site['email'], 'New inquiry from website', "Name: $n\nPhone: $p\nEmail: $e\nBreed: $b\nMessage: $m", "From: no-reply@" . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+        $msg = 'ok';
+    } else {
+        $msg = 'err';
+    }
 }
 
 require __DIR__ . '/includes/header.php';
@@ -201,371 +202,373 @@ require __DIR__ . '/includes/header.php';
 <main id="home">
     <!-- HERO (Dynamic Slider from banners table) -->
     <?php
-  $hero_slides = [];
-  $hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
-  if ($hero_q && mysqli_num_rows($hero_q) > 0) {
-      while ($h_row = mysqli_fetch_assoc($hero_q)) {
-          $b_path = $h_row['banner_path'];
-          if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
-              $b_path = 'admin/' . ltrim($b_path, '/');
-          }
-          
-          $hero_slides[] = [
-              'title'       => $h_row['title'],
-              'description' => $h_row['description'],
-              'image_url'   => $b_path,
-              'link_url'    => !empty($h_row['link_url']) ? $h_row['link_url'] : '#breeds'
-          ];
-      }
-  }
+    $hero_slides = [];
+    $hero_q = mysqli_query($conn, "SELECT * FROM banners WHERE status=1 ORDER BY display_order ASC, id DESC");
+    if ($hero_q && mysqli_num_rows($hero_q) > 0) {
+        while ($h_row = mysqli_fetch_assoc($hero_q)) {
+            $b_path = $h_row['banner_path'];
+            if (strpos($b_path, 'http') !== 0 && strpos($b_path, 'admin/') !== 0) {
+                $b_path = 'admin/' . ltrim($b_path, '/');
+            }
 
-  // Fallback agar banners table khali ho
-  if (empty($hero_slides)) {
-      $hero_slides[] = [
-          'title'       => 'Bring home a healthy puppy you can trust.',
-          'description' => 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.',
-          'image_url'   => 'admin/assets/img/uploads/golden.png',
-          'link_url'    => '#breeds'
-      ];
-  }
-  ?>
+            $hero_slides[] = [
+                'title'       => $h_row['title'],
+                'description' => $h_row['description'],
+                'image_url'   => $b_path,
+                'link_url'    => !empty($h_row['link_url']) ? $h_row['link_url'] : '#breeds'
+            ];
+        }
+    }
+
+    // Fallback agar banners table khali ho
+    if (empty($hero_slides)) {
+        $hero_slides[] = [
+            'title'       => 'Bring home a healthy puppy you can trust.',
+            'description' => 'Vet checked, fully vaccinated, pure breed puppies in Patel Nagar, New Delhi. We show you every record before you decide.',
+            'image_url'   => 'admin/assets/img/uploads/golden.png',
+            'link_url'    => '#breeds'
+        ];
+    }
+    ?>
 
     <section class="hero" style="padding-bottom:0; position:relative; overflow:hidden;">
         <div class="blob b1"></div>
         <div class="blob b2"></div>
         <?php for ($k = 0; $k < 9; $k++): ?>
-        <span class="paw"
-            style="left:<?= ($k * 11 + 5) % 96 ?>%;animation-delay:<?= $k * 1.4 ?>s;font-size:<?= 16 + ($k % 3) * 8 ?>px">🐾</span>
+            <span class="paw"
+                style="left:<?= ($k * 11 + 5) % 96 ?>%;animation-delay:<?= $k * 1.4 ?>s;font-size:<?= 16 + ($k % 3) * 8 ?>px">🐾</span>
         <?php endfor; ?>
 
         <div class="wrap">
             <?php foreach ($hero_slides as $index => $hero): ?>
-            <div class="hero-slide-pane" style="display: <?= $index === 0 ? 'contents' : 'none' ?>;"
-                data-slide-index="<?= $index ?>">
-                <div>
-                    <div class="chip seq"><?= gicon(18) ?> <span><b><?= h($rating['score'] ?? '4.9') ?></b> rated on
-                            Google by <?= h($rating['count'] ?? '15+') ?>+ pet parents</span></div>
+                <div class="hero-slide-pane" style="display: <?= $index === 0 ? 'contents' : 'none' ?>;"
+                    data-slide-index="<?= $index ?>">
+                    <div>
+                        <div class="chip seq"><?= gicon(18) ?> <span><b><?= h($rating['score'] ?? '4.9') ?></b> rated on
+                                Google by 2k+ pet parents</span></div>
 
-                    <h1 class="split"><?= htmlspecialchars($hero['title']) ?></h1>
-                    <p class="lead seq"><?= htmlspecialchars($hero['description']) ?></p>
+                        <h1 class="split"><?= htmlspecialchars($hero['title']) ?></h1>
+                        <p class="lead seq"><?= htmlspecialchars($hero['description']) ?></p>
 
-                    <div class="cta seq">
-                        <a class="btn btn-teal" href="<?= htmlspecialchars($hero['link_url']) ?>">See available
-                            puppies</a>
-                        <a class="btn btn-line" href="#videos">Watch customer stories</a>
-                    </div>
-
-                    <div class="mini-proof seq">
-                        <div class="faces">
-                            <?php foreach ([$P['grass'] ?? '', $P['tan'] ?? '', $P['tongue'] ?? '', $P['sweater'] ?? ''] as $f): if ($f): ?>
-                            <img src="<?= ph($f, 100) ?>" alt="">
-                            <?php endif; endforeach; ?>
+                        <div class="cta seq">
+                            <a class="btn btn-teal" href="<?= htmlspecialchars($hero['link_url']) ?>">See available
+                                puppies</a>
+                            <a class="btn btn-line" href="#videos">Watch customer stories</a>
                         </div>
-                        <div><span class="stars">★★★★★</span><small>Trusted by 420+ happy clients</small></div>
-                    </div>
-                </div>
 
-                <div class="hero-img">
-                    <div class="arch">
-                        <img src="<?= htmlspecialchars($hero['image_url']) ?>" alt="Kyra Pet Shop Hero"
-                            <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                        <div class="mini-proof seq">
+                            <div class="faces">
+                                <?php foreach ([$P['grass'] ?? '', $P['tan'] ?? '', $P['tongue'] ?? '', $P['sweater'] ?? ''] as $f): if ($f): ?>
+                                        <img src="<?= ph($f, 100) ?>" alt="">
+                                <?php endif;
+                                endforeach; ?>
+                            </div>
+                            <div><span class="stars">★★★★★</span><small>Trusted by 420+ happy clients</small></div>
+                        </div>
                     </div>
-                    <div class="fb b"><i>🩺</i><span>Vet checked<small>Health records shared</small></span></div>
-                    <div class="fb a"><i>💉</i><span>100% vaccinated<small>Card given at pickup</small></span></div>
+
+                    <div class="hero-img">
+                        <div class="arch">
+                            <img src="<?= htmlspecialchars($hero['image_url']) ?>" alt="Kyra Pet Shop Hero"
+                                <?= $index === 0 ? 'fetchpriority="high"' : '' ?>>
+                        </div>
+                        <div class="fb b"><i>🩺</i><span>Vet checked<small>Health records shared</small></span></div>
+                        <div class="fb a"><i>💉</i><span>100% vaccinated<small>Card given at pickup</small></span></div>
+                    </div>
                 </div>
-            </div>
             <?php endforeach; ?>
         </div>
 
         <?php if (count($hero_slides) > 1): ?>
-        <div class="hero-dots" style="text-align: center; padding: 12px 0 0; position: relative; z-index: 10;">
-            <?php foreach ($hero_slides as $index => $slide): ?>
-            <span class="h-dot <?= $index === 0 ? 'active' : '' ?>" data-slide="<?= $index ?>"
-                style="display: inline-block; width: 12px; height: 12px; margin: 0 5px; background: <?= $index === 0 ? 'var(--teal, #0d9488)' : '#cbd5e1' ?>; border-radius: 50%; cursor: pointer; transition: background 0.3s;"></span>
-            <?php endforeach; ?>
-        </div>
+            <div class="hero-dots" style="text-align: center; padding: 12px 0 0; position: relative; z-index: 10;">
+                <?php foreach ($hero_slides as $index => $slide): ?>
+                    <span class="h-dot <?= $index === 0 ? 'active' : '' ?>" data-slide="<?= $index ?>"
+                        style="display: inline-block; width: 12px; height: 12px; margin: 0 5px; background: <?= $index === 0 ? 'var(--teal, #0d9488)' : '#cbd5e1' ?>; border-radius: 50%; cursor: pointer; transition: background 0.3s;"></span>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
     </section>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const panes = document.querySelectorAll('.hero-slide-pane');
-        const dots = document.querySelectorAll('.h-dot');
-        if (panes.length <= 1) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const panes = document.querySelectorAll('.hero-slide-pane');
+            const dots = document.querySelectorAll('.h-dot');
+            if (panes.length <= 1) return;
 
-        let currentSlide = 0;
+            let currentSlide = 0;
 
-        function showSlide(index) {
-            panes.forEach((pane, idx) => {
-                pane.style.display = (idx === index) ? 'contents' : 'none';
-            });
+            function showSlide(index) {
+                panes.forEach((pane, idx) => {
+                    pane.style.display = (idx === index) ? 'contents' : 'none';
+                });
+                dots.forEach((dot, idx) => {
+                    dot.style.background = (idx === index) ? 'var(--teal, #0d9488)' : '#cbd5e1';
+                });
+                currentSlide = index;
+            }
+
+            let slideInterval = setInterval(() => {
+                let next = (currentSlide + 1) % panes.length;
+                showSlide(next);
+            }, 5000);
+
             dots.forEach((dot, idx) => {
-                dot.style.background = (idx === index) ? 'var(--teal, #0d9488)' : '#cbd5e1';
-            });
-            currentSlide = index;
-        }
-
-        let slideInterval = setInterval(() => {
-            let next = (currentSlide + 1) % panes.length;
-            showSlide(next);
-        }, 5000);
-
-        dots.forEach((dot, idx) => {
-            dot.addEventListener('click', () => {
-                clearInterval(slideInterval);
-                showSlide(idx);
+                dot.addEventListener('click', () => {
+                    clearInterval(slideInterval);
+                    showSlide(idx);
+                });
             });
         });
-    });
     </script>
 
     <!-- MARQUEE -->
     <div class="marq">
         <div class="marq-track">
-            <?php for ($k = 0; $k < 2; $k++): foreach (['Vet checked puppies', '100% vaccinated', 'Pure breed guarantee', 'Visit before you buy', 'Lifetime care support', 'KCI registered puppies', 'Rated ' . ($rating['score'] ?? '4.9') . ' on Google', 'Visit us in Patel Nagar'] as $t): ?><span><b>✦</b><?= h($t) ?></span><?php endforeach; endfor; ?>
+            <?php for ($k = 0; $k < 2; $k++): foreach (['Vet checked puppies', '100% vaccinated', 'Pure breed guarantee', 'Visit before you buy', 'Lifetime care support', 'KCI registered puppies', 'Rated ' . ($rating['score'] ?? '4.9') . ' on Google', 'Visit us in Patel Nagar'] as $t): ?><span><b>✦</b><?= h($t) ?></span><?php endforeach;
+                                                                                                                                                                                                                                                                                                                            endfor; ?>
         </div>
     </div>
 
     <!-- OUR HAPPY CUSTOMERS (Larger & More Attractive Cards + Video Grid Fixes) -->
     <style>
-    /* ================= MOBILE HORIZONTAL SCROLL & SHAKE FIX ================= */
-    html,
-    body {
-        overflow-x: hidden !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-        position: relative;
-    }
-
-    main#home,
-    main#home>section,
-    .marq,
-    .stats,
-    .band {
-        overflow-x: hidden !important;
-        max-width: 100vw !important;
-    }
-
-    /* Grid items aur animations ko screen se bahar jane se rokne ke liye */
-    .hero .wrap>*,
-    .hero-slide-pane>*,
-    .about .wrap>*,
-    .videos .wrap>*,
-    .duo>*,
-    .cbox>*,
-    .rhead>* {
-        min-width: 0 !important;
-        max-width: 100% !important;
-    }
-
-    /* Mobile par animation की wajah se layout shift na ho */
-    @media (max-width: 768px) {
-
-        [data-anim="left"],
-        [data-anim="right"] {
-            transform: translateY(24px) !important;
-        }
-
-        [data-anim="left"].in,
-        [data-anim="right"].in,
-        .rv.in,
-        .rv.show {
-            transform: translate(0, 0) !important;
-        }
-
-        .panel table {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .cbox iframe {
+        /* ================= MOBILE HORIZONTAL SCROLL & SHAKE FIX ================= */
+        html,
+        body {
+            overflow-x: hidden !important;
             width: 100% !important;
+            max-width: 100vw !important;
+            position: relative;
+        }
+
+        main#home,
+        main#home>section,
+        .marq,
+        .stats,
+        .band {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+        }
+
+        /* Grid items aur animations ko screen se bahar jane se rokne ke liye */
+        .hero .wrap>*,
+        .hero-slide-pane>*,
+        .about .wrap>*,
+        .videos .wrap>*,
+        .duo>*,
+        .cbox>*,
+        .rhead>* {
+            min-width: 0 !important;
             max-width: 100% !important;
         }
-    }
 
-    .hc-wrapper {
-        padding: 85px 0;
-        background: var(--bg-alt, #f8f9fa);
-        overflow: hidden;
-    }
+        /* Mobile par animation की wajah se layout shift na ho */
+        @media (max-width: 768px) {
 
-    .hc-container {
-        position: relative;
-        max-width: 1440px;
-        margin: 0 auto;
-    }
+            [data-anim="left"],
+            [data-anim="right"] {
+                transform: translateY(24px) !important;
+            }
 
-    .hc-slider {
-        display: flex;
-        gap: 26px;
-        overflow-x: auto;
-        padding: 24px 4%;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        scroll-behavior: smooth;
-    }
+            [data-anim="left"].in,
+            [data-anim="right"].in,
+            .rv.in,
+            .rv.show {
+                transform: translate(0, 0) !important;
+            }
 
-    .hc-slider::-webkit-scrollbar {
-        display: none;
-    }
+            .panel table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
 
-    /* Bigger, Bolder & More Attractive Customer Cards */
-    .hc-item {
-        flex: 0 0 calc(28% - 18px);
-        min-width: 310px;
-        scroll-snap-align: center;
-        border-radius: 26px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
-        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease;
-        aspect-ratio: 3 / 3.9;
-        position: relative;
-        cursor: grab;
-        border: 4px solid #ffffff;
-    }
-
-    @media(max-width: 1100px) {
-        .hc-item {
-            flex: 0 0 calc(40% - 16px);
-            min-width: 280px;
+            .cbox iframe {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
         }
-    }
 
-    @media(max-width: 768px) {
-        .hc-item {
-            flex: 0 0 calc(65% - 14px);
-            min-width: 260px;
+        .hc-wrapper {
+            padding: 85px 0;
+            background: var(--bg-alt, #f8f9fa);
+            overflow: hidden;
         }
-    }
 
-    @media(max-width: 480px) {
-        .hc-item {
-            flex: 0 0 calc(84% - 10px);
-            min-width: 240px;
+        .hc-container {
+            position: relative;
+            max-width: 1440px;
+            margin: 0 auto;
         }
-    }
 
-    .hc-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.65s ease;
-    }
+        .hc-slider {
+            display: flex;
+            gap: 26px;
+            overflow-x: auto;
+            padding: 24px 4%;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
+        }
 
-    .hc-item:hover {
-        transform: translateY(-12px) scale(1.01);
-        box-shadow: 0 26px 55px rgba(15, 23, 42, 0.18);
-    }
-
-    .hc-item:hover img {
-        transform: scale(1.08);
-    }
-
-    .hc-item::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 22px;
-        background: linear-gradient(to top, rgba(15, 23, 42, 0.28) 0%, transparent 35%);
-        pointer-events: none;
-    }
-
-    /* Premium Navigation Arrows */
-    .hc-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 54px;
-        height: 54px;
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 50%;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-        font-size: 22px;
-        color: #0f172a;
-        transition: all 0.3s ease;
-    }
-
-    .hc-nav:hover {
-        background: var(--teal, #0d9488);
-        color: #fff;
-        border-color: var(--teal, #0d9488);
-        transform: translateY(-50%) scale(1.08);
-    }
-
-    .hc-prev {
-        left: 1.5%;
-    }
-
-    .hc-next {
-        right: 1.5%;
-    }
-
-    .hc-nav svg {
-        width: 26px;
-        height: 26px;
-        fill: currentColor;
-    }
-
-    @media(max-width: 768px) {
-        .hc-nav {
+        .hc-slider::-webkit-scrollbar {
             display: none;
         }
-    }
 
-    /* Video Sections Grid Layout Support for 6, 3, and 3 Videos */
-    .vs2 .fan.multi-vids {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-        align-items: stretch;
-    }
-
-    .vs2 .fan.multi-vids>* {
-        transform: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-    }
-
-    .vs1 .trio {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-    }
-
-    .vs3 .pp {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-    }
-
-    @media(max-width: 900px) {
-
-        .vs2 .fan.multi-vids,
-        .vs1 .trio,
-        .vs3 .pp {
-            grid-template-columns: repeat(2, 1fr);
+        /* Bigger, Bolder & More Attractive Customer Cards */
+        .hc-item {
+            flex: 0 0 calc(28% - 18px);
+            min-width: 310px;
+            scroll-snap-align: center;
+            border-radius: 26px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease;
+            aspect-ratio: 3 / 3.9;
+            position: relative;
+            cursor: grab;
+            border: 4px solid #ffffff;
         }
-    }
 
-    @media(max-width: 560px) {
-
-        .vs2 .fan.multi-vids,
-        .vs1 .trio,
-        .vs3 .pp {
-            grid-template-columns: 1fr;
+        @media(max-width: 1100px) {
+            .hc-item {
+                flex: 0 0 calc(40% - 16px);
+                min-width: 280px;
+            }
         }
-    }
+
+        @media(max-width: 768px) {
+            .hc-item {
+                flex: 0 0 calc(65% - 14px);
+                min-width: 260px;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .hc-item {
+                flex: 0 0 calc(84% - 10px);
+                min-width: 240px;
+            }
+        }
+
+        .hc-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.65s ease;
+        }
+
+        .hc-item:hover {
+            transform: translateY(-12px) scale(1.01);
+            box-shadow: 0 26px 55px rgba(15, 23, 42, 0.18);
+        }
+
+        .hc-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .hc-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.28) 0%, transparent 35%);
+            pointer-events: none;
+        }
+
+        /* Premium Navigation Arrows */
+        .hc-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 54px;
+            height: 54px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-size: 22px;
+            color: #0f172a;
+            transition: all 0.3s ease;
+        }
+
+        .hc-nav:hover {
+            background: var(--teal, #0d9488);
+            color: #fff;
+            border-color: var(--teal, #0d9488);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .hc-prev {
+            left: 1.5%;
+        }
+
+        .hc-next {
+            right: 1.5%;
+        }
+
+        .hc-nav svg {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+        }
+
+        @media(max-width: 768px) {
+            .hc-nav {
+                display: none;
+            }
+        }
+
+        /* Video Sections Grid Layout Support for 6, 3, and 3 Videos */
+        .vs2 .fan.multi-vids {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .vs2 .fan.multi-vids>* {
+            transform: none !important;
+            margin: 0 !important;
+            width: 100% !important;
+        }
+
+        .vs1 .trio {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .vs3 .pp {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media(max-width: 900px) {
+
+            .vs2 .fan.multi-vids,
+            .vs1 .trio,
+            .vs3 .pp {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 560px) {
+
+            .vs2 .fan.multi-vids,
+            .vs1 .trio,
+            .vs3 .pp {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 
     <section class="hc-wrapper" id="happy-customers">
@@ -586,15 +589,15 @@ require __DIR__ . '/includes/header.php';
             </button>
 
             <div class="hc-slider" id="hc-slider">
-                <?php 
-        $fallback_gal = !empty($db_gallery) ? $db_gallery : ($gallery ?? []);
-        $display_hc = !empty($db_happy_customers) ? $db_happy_customers : $fallback_gal;
-        foreach ($display_hc as $hc_img): 
-          $hc_src = (strpos($hc_img, '/') !== false) ? $hc_img : ph($hc_img, 800);
-        ?>
-                <div class="hc-item">
-                    <img src="<?= h($hc_src) ?>" alt="Happy customer with puppy at Kyra Pet Shop" loading="lazy">
-                </div>
+                <?php
+                $fallback_gal = !empty($db_gallery) ? $db_gallery : ($gallery ?? []);
+                $display_hc = !empty($db_happy_customers) ? $db_happy_customers : $fallback_gal;
+                foreach ($display_hc as $hc_img):
+                    $hc_src = (strpos($hc_img, '/') !== false) ? $hc_img : ph($hc_img, 800);
+                ?>
+                    <div class="hc-item">
+                        <img src="<?= h($hc_src) ?>" alt="Happy customer with puppy at Kyra Pet Shop" loading="lazy">
+                    </div>
                 <?php endforeach; ?>
             </div>
 
@@ -607,70 +610,70 @@ require __DIR__ . '/includes/header.php';
     </section>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const slider = document.getElementById('hc-slider');
-        const btnPrev = document.getElementById('hc-prev');
-        const btnNext = document.getElementById('hc-next');
-        if (!slider) return;
-        let autoScrollTimer;
+        document.addEventListener("DOMContentLoaded", function() {
+            const slider = document.getElementById('hc-slider');
+            const btnPrev = document.getElementById('hc-prev');
+            const btnNext = document.getElementById('hc-next');
+            if (!slider) return;
+            let autoScrollTimer;
 
-        function getScrollAmount() {
-            const item = slider.querySelector('.hc-item');
-            return item ? item.offsetWidth + 26 : 340;
-        }
-
-        function slideNext() {
-            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
-                slider.scrollTo({
-                    left: 0,
-                    behavior: 'smooth'
-                });
-            } else {
-                slider.scrollBy({
-                    left: getScrollAmount(),
-                    behavior: 'smooth'
-                });
+            function getScrollAmount() {
+                const item = slider.querySelector('.hc-item');
+                return item ? item.offsetWidth + 26 : 340;
             }
-        }
 
-        function slidePrev() {
-            if (slider.scrollLeft <= 0) {
-                slider.scrollTo({
-                    left: slider.scrollWidth,
-                    behavior: 'smooth'
-                });
-            } else {
-                slider.scrollBy({
-                    left: -getScrollAmount(),
-                    behavior: 'smooth'
-                });
+            function slideNext() {
+                if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
+                    slider.scrollTo({
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    slider.scrollBy({
+                        left: getScrollAmount(),
+                        behavior: 'smooth'
+                    });
+                }
             }
-        }
 
-        if (btnNext) btnNext.addEventListener('click', slideNext);
-        if (btnPrev) btnPrev.addEventListener('click', slidePrev);
+            function slidePrev() {
+                if (slider.scrollLeft <= 0) {
+                    slider.scrollTo({
+                        left: slider.scrollWidth,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    slider.scrollBy({
+                        left: -getScrollAmount(),
+                        behavior: 'smooth'
+                    });
+                }
+            }
 
-        function startAutoScroll() {
-            autoScrollTimer = setInterval(slideNext, 3200);
-        }
+            if (btnNext) btnNext.addEventListener('click', slideNext);
+            if (btnPrev) btnPrev.addEventListener('click', slidePrev);
 
-        function stopAutoScroll() {
-            clearInterval(autoScrollTimer);
-        }
+            function startAutoScroll() {
+                autoScrollTimer = setInterval(slideNext, 3200);
+            }
 
-        slider.addEventListener('mouseenter', stopAutoScroll);
-        slider.addEventListener('mouseleave', startAutoScroll);
-        slider.addEventListener('touchstart', stopAutoScroll, {
-            passive: true
+            function stopAutoScroll() {
+                clearInterval(autoScrollTimer);
+            }
+
+            slider.addEventListener('mouseenter', stopAutoScroll);
+            slider.addEventListener('mouseleave', startAutoScroll);
+            slider.addEventListener('touchstart', stopAutoScroll, {
+                passive: true
+            });
+            slider.addEventListener('touchend', startAutoScroll, {
+                passive: true
+            });
+            if (btnNext) btnNext.addEventListener('mouseenter', stopAutoScroll);
+            if (btnPrev) btnPrev.addEventListener('mouseenter', stopAutoScroll);
+
+            startAutoScroll();
         });
-        slider.addEventListener('touchend', startAutoScroll, {
-            passive: true
-        });
-        if (btnNext) btnNext.addEventListener('mouseenter', stopAutoScroll);
-        if (btnPrev) btnPrev.addEventListener('mouseenter', stopAutoScroll);
-
-        startAutoScroll();
-    });
     </script>
 
     <!-- BREEDS -->
@@ -683,16 +686,16 @@ require __DIR__ . '/includes/header.php';
 
             <div class="grid4">
                 <?php
-        $display_dogs = !empty($db_dogs) ? $db_dogs : array_slice($dogs, 0, 8);
-        foreach ($display_dogs as $d) {
-          if (function_exists('dog_card')) dog_card($d, $site);
-        }
-        ?>
+                $display_dogs = !empty($db_dogs) ? $db_dogs : array_slice($dogs, 0, 8);
+                foreach ($display_dogs as $d) {
+                    if (function_exists('dog_card')) dog_card($d, $site);
+                }
+                ?>
             </div>
 
             <div class="chips rv"><span>Also available:</span><?php if (!empty($more)) foreach ($more as $m): ?><a
-                    href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, do you have ' . $m . ' puppies?') ?>"
-                    target="_blank" rel="noopener"><?= h($m) ?></a><?php endforeach; ?></div>
+                        href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, do you have ' . $m . ' puppies?') ?>"
+                        target="_blank" rel="noopener"><?= h($m) ?></a><?php endforeach; ?></div>
             <div class="center"><a class="btn btn-navy" href="breeds">View all breeds</a></div>
         </div>
     </section>
@@ -706,14 +709,14 @@ require __DIR__ . '/includes/header.php';
                     moments.</p>
             </div>
             <?php
-      $display_v2 = !empty($db_v2) ? $db_v2 : array_slice($v2 ?? [], 0, $limit_forever_homes);
-      ?>
+            $display_v2 = !empty($db_v2) ? $db_v2 : array_slice($v2 ?? [], 0, $limit_forever_homes);
+            ?>
             <div class="fan multi-vids rv" data-anim="zoom">
                 <?php
-        foreach ($display_v2 as $i => $v) {
-          if (function_exists('vcard')) echo vcard($v, $i % 3);
-        }
-        ?>
+                foreach ($display_v2 as $i => $v) {
+                    if (function_exists('vcard')) echo vcard($v, $i % 3);
+                }
+                ?>
             </div>
             <div class="center"><a class="btn btn-teal" target="_blank" rel="noopener"
                     href="https://wa.me/<?= h($site['wa'] ?? '') ?>?text=<?= rawurlencode('Hi Kyra Pet Shop, I saw your videos and want a puppy.') ?>">Get
@@ -730,7 +733,7 @@ require __DIR__ . '/includes/header.php';
                     <div class="big"><?= h($rating['score'] ?? '4.9') ?> <?= stars(5) ?></div>
                     <p>Based on <?= h($rating['count'] ?? '15') ?> reviews</p>
                     <?php if (!empty($rating['bars'])) foreach ($rating['bars'] as $n => $pc): ?><div class="bar">
-                        <?= $n ?>★<div><i data-w="<?= $pc ?>"></i></div><?= $pc ?>%</div><?php endforeach; ?>
+                            <?= $n ?>★<div><i data-w="<?= $pc ?>"></i></div><?= $pc ?>%</div><?php endforeach; ?>
                 </div>
                 <div class="badges rv">
                     <span class="tag" style="align-self:flex-start">Verified customer reviews</span>
@@ -749,28 +752,28 @@ require __DIR__ . '/includes/header.php';
             <div class="rwrap">
                 <div class="rtrack" id="rtrack">
                     <?php
-          $display_reviews = !empty($db_reviews) ? $db_reviews : $reviews;
-          foreach ($display_reviews as $r):
-          ?>
-                    <article class="rc">
-                        <div class="top"><span class="av"
-                                style="background:<?= h($r[6]) ?>"><?= h(mb_substr($r[0], 0, 1)) ?></span>
-                            <div>
-                                <div class="nm"><?= h($r[0]) ?>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" aria-label="Verified">
-                                        <circle cx="12" cy="12" r="12" fill="#1a73e8" />
-                                        <path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.4" fill="none"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
+                    $display_reviews = !empty($db_reviews) ? $db_reviews : $reviews;
+                    foreach ($display_reviews as $r):
+                    ?>
+                        <article class="rc">
+                            <div class="top"><span class="av"
+                                    style="background:<?= h($r[6]) ?>"><?= h(mb_substr($r[0], 0, 1)) ?></span>
+                                <div>
+                                    <div class="nm"><?= h($r[0]) ?>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" aria-label="Verified">
+                                            <circle cx="12" cy="12" r="12" fill="#1a73e8" />
+                                            <path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.4" fill="none"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <small><?= h($r[1]) ?></small>
                                 </div>
-                                <small><?= h($r[1]) ?></small>
+                                <span class="src"><?= gicon(24) ?></span>
                             </div>
-                            <span class="src"><?= gicon(24) ?></span>
-                        </div>
-                        <div class="st"><?= stars($r[3]) ?> <span><?= h($r[2]) ?></span></div>
-                        <p>"<?= h($r[5]) ?>"</p>
-                        <div class="ver">✔ Posted on Google</div>
-                    </article>
+                            <div class="st"><?= stars($r[3]) ?> <span><?= h($r[2]) ?></span></div>
+                            <p>"<?= h($r[5]) ?>"</p>
+                            <div class="ver">✔ Posted on Google</div>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -830,14 +833,14 @@ require __DIR__ . '/includes/header.php';
             </div>
             <div class="gal-grid">
                 <?php
-        $display_gallery = !empty($db_gallery) ? $db_gallery : $gallery;
-        foreach ($display_gallery as $g):
-          $img_src = (strpos($g, '/') !== false) ? $g : ph($g, 800);
-          $full_src = (strpos($g, '/') !== false) ? $g : ph($g, 1600);
-        ?>
-                <a class="rv" href="<?= h($full_src) ?>" target="_blank" rel="noopener">
-                    <img src="<?= h($img_src) ?>" alt="Puppy at Kyra Pet Shop" loading="lazy">
-                </a>
+                $display_gallery = !empty($db_gallery) ? $db_gallery : $gallery;
+                foreach ($display_gallery as $g):
+                    $img_src = (strpos($g, '/') !== false) ? $g : ph($g, 800);
+                    $full_src = (strpos($g, '/') !== false) ? $g : ph($g, 1600);
+                ?>
+                    <a class="rv" href="<?= h($full_src) ?>" target="_blank" rel="noopener">
+                        <img src="<?= h($img_src) ?>" alt="Puppy at Kyra Pet Shop" loading="lazy">
+                    </a>
                 <?php endforeach; ?>
             </div>
             <div class="center"><a class="btn btn-teal" href="gallery">View full gallery</a> &nbsp; <a
@@ -849,9 +852,9 @@ require __DIR__ . '/includes/header.php';
     <!-- STATS -->
     <div class="stats">
         <div class="wrap"><?php if (!empty($stats)) foreach ($stats as $s): ?>
-            <div class="stat"><b><span
-                        data-count="<?= h($s[0]) ?>"><?= h($s[0]) ?></span><small><?= h($s[1]) ?></small></b><span><?= h($s[2]) ?></span>
-            </div><?php endforeach; ?>
+                <div class="stat"><b><span
+                            data-count="<?= h($s[0]) ?>"><?= h($s[0]) ?></span><small><?= h($s[1]) ?></small></b><span><?= h($s[2]) ?></span>
+                </div><?php endforeach; ?>
         </div>
     </div>
 
@@ -863,10 +866,10 @@ require __DIR__ . '/includes/header.php';
                 <p>Trust is earned with transparency. Here is what you can expect from us.</p>
             </div>
             <div class="fgrid"><?php if (!empty($features)) foreach ($features as $f): ?>
-                <div class="fcard rv"><i><?= $f[0] ?></i>
-                    <h3><?= h($f[1]) ?></h3>
-                    <p><?= h($f[2]) ?></p>
-                </div><?php endforeach; ?>
+                    <div class="fcard rv"><i><?= $f[0] ?></i>
+                        <h3><?= h($f[1]) ?></h3>
+                        <p><?= h($f[2]) ?></p>
+                    </div><?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -879,9 +882,9 @@ require __DIR__ . '/includes/header.php';
                 <p>No rush and no hidden steps. You stay informed at every stage.</p>
             </div>
             <div class="steps rv"><?php if (!empty($steps)) foreach ($steps as $s): ?><div class="step rv">
-                    <h3><?= h($s[0]) ?></h3>
-                    <p><?= h($s[1]) ?></p>
-                </div><?php endforeach; ?></div>
+                        <h3><?= h($s[0]) ?></h3>
+                        <p><?= h($s[1]) ?></p>
+                    </div><?php endforeach; ?></div>
             <div class="center"><a class="btn btn-teal" href="how-it-works">See the full process</a></div>
         </div>
     </section>
@@ -912,10 +915,10 @@ require __DIR__ . '/includes/header.php';
                         </thead>
                         <tbody>
                             <?php if (!empty($compare)) foreach ($compare as $c): ?><tr>
-                                <td style="text-align:left;color:var(--ink);font-weight:600"><?= h($c[0]) ?></td>
-                                <td><?= h($c[1]) ?></td>
-                                <td><?= h($c[2]) ?></td>
-                            </tr><?php endforeach; ?></tbody>
+                                    <td style="text-align:left;color:var(--ink);font-weight:600"><?= h($c[0]) ?></td>
+                                    <td><?= h($c[1]) ?></td>
+                                    <td><?= h($c[2]) ?></td>
+                                </tr><?php endforeach; ?></tbody>
                     </table>
                 </div>
             </div>
@@ -941,11 +944,11 @@ require __DIR__ . '/includes/header.php';
             </div>
             <div class="trio rv" data-anim="right">
                 <?php
-        $display_v1 = !empty($db_v1) ? $db_v1 : array_slice($v1 ?? [], 0, $limit_customer_stories);
-        foreach ($display_v1 as $i => $v) {
-          if (function_exists('vcard')) echo vcard($v, $i % 3);
-        }
-        ?>
+                $display_v1 = !empty($db_v1) ? $db_v1 : array_slice($v1 ?? [], 0, $limit_customer_stories);
+                foreach ($display_v1 as $i => $v) {
+                    if (function_exists('vcard')) echo vcard($v, $i % 3);
+                }
+                ?>
             </div>
         </div>
     </section>
@@ -959,14 +962,14 @@ require __DIR__ . '/includes/header.php';
             </div>
             <div class="pp">
                 <?php
-        $display_v3 = !empty($db_v3) ? $db_v3 : array_slice($v3 ?? [], 0, $limit_ask_them);
-        foreach ($display_v3 as $i => $v):
-        ?>
-                <div class="ppc rv">
-                    <?php if (function_exists('vcard')) echo vcard($v, $i % 3); ?>
-                    <div class="q"><?= stars(5) ?><b><?= h($v[1] ?? 'Customer') ?></b><span>Customer feedback at Kyra
-                            Pet Shop</span></div>
-                </div>
+                $display_v3 = !empty($db_v3) ? $db_v3 : array_slice($v3 ?? [], 0, $limit_ask_them);
+                foreach ($display_v3 as $i => $v):
+                ?>
+                    <div class="ppc rv">
+                        <?php if (function_exists('vcard')) echo vcard($v, $i % 3); ?>
+                        <div class="q"><?= stars(5) ?><b><?= h($v[1] ?? 'Customer') ?></b><span>Customer feedback at Kyra
+                                Pet Shop</span></div>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -999,11 +1002,11 @@ require __DIR__ . '/includes/header.php';
             </div>
             <div class="bgrid">
                 <?php
-        $display_blog = !empty($db_blog) ? $db_blog : $blog;
-        foreach (array_slice($display_blog, 0, 3) as $b) {
-          if (function_exists('blog_card')) blog_card($b);
-        }
-        ?>
+                $display_blog = !empty($db_blog) ? $db_blog : $blog;
+                foreach (array_slice($display_blog, 0, 3) as $b) {
+                    if (function_exists('blog_card')) blog_card($b);
+                }
+                ?>
             </div>
             <div class="center">
                 <a class="btn btn-navy" href="blog">Read all articles</a>
@@ -1018,9 +1021,9 @@ require __DIR__ . '/includes/header.php';
                 <h2>Questions before you visit</h2>
             </div>
             <div class="faq-list"><?php if (!empty($faq)) foreach ($faq as $f): ?><details>
-                    <summary><?= h($f[0]) ?></summary>
-                    <p><?= h($f[1]) ?></p>
-                </details><?php endforeach; ?></div>
+                        <summary><?= h($f[0]) ?></summary>
+                        <p><?= h($f[1]) ?></p>
+                    </details><?php endforeach; ?></div>
         </div>
     </section>
 
@@ -1057,9 +1060,9 @@ require __DIR__ . '/includes/header.php';
                     <h3>Looking for a specific breed?</h3>
                     <p class="sub">Share your details and we will send photos, videos and health records.</p>
                     <?php if ($msg === 'ok'): ?><div class="alert ok" role="status">Thank you. We received your inquiry
-                        and will call you soon.</div>
+                            and will call you soon.</div>
                     <?php elseif ($msg === 'err'): ?><div class="alert err" role="alert">Please enter your name and a
-                        valid phone number.</div><?php endif; ?>
+                            valid phone number.</div><?php endif; ?>
                     <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <div class="f2"><input name="name" placeholder="Your name" required><input name="phone" type="tel"
                             placeholder="Phone number" required></div>
