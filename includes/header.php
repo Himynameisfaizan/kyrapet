@@ -45,7 +45,7 @@ $canonical_url = $protocol . $_SERVER['HTTP_HOST'] . $clean_path;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS aur Images ke path theek karne ke liye -->
-    <base href="/projects/kyrapet/">
+    <base href="/office_php_project/kyrapet/">
 
     <!-- DYNAMIC CANONICAL TAG -->
     <link rel="canonical" href="<?= htmlspecialchars($canonical_url) ?>" />

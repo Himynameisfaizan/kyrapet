@@ -14,7 +14,7 @@ if ($local) {
     $username = 'root';
     $password = '';
     $dbName = 'kyrapet';
-    $site = "http://localhost/projects/kyrapet/";
+    $site = "http://localhost/office_php_project/kyrapet/";
 } else {
     $host = 'localhost';
     $username = 'u776339737_kyra_pet';

@@ -1,6 +1,6 @@
 RewriteEngine On
 # Base path (Live server par isko sirf / rakhna)
-RewriteBase /projects/kyrapet/
+RewriteBase /office_php_project/kyrapet/
 
 # 1. Sitemap Dynamic Route
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
@@ -17,4 +17,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
 
 # 4. 404 Error Page 
-ErrorDocument 404 /projects/kyrapet/404.php
+ErrorDocument 404 /office_php_project/kyrapet/404.php
