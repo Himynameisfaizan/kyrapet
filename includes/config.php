@@ -196,7 +196,7 @@ function dog_card($d,$site){ $t=rawurlencode("Hi Kyra Pet Shop, I am interested 
 }
 
 if (!function_exists('blog_card')) {
-    function blog_card($b){ $u='blog-post/'.urlencode($b['slug']); ?>
+    function blog_card($b){ $u='blog/'.urlencode($b['slug']); ?>
 <article class="bcard rv" data-cat="<?=h($b['cat'])?>">
     <a class="bim" href="<?=$u?>">
         <img src="<?=h(strpos($b['img'],'/')!==false ? $b['img'] : ph($b['img'],700))?>" alt="<?=h($b['title'])?>"

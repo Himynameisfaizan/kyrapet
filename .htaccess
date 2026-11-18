@@ -2,19 +2,69 @@ RewriteEngine On
 # Base path (Live server par isko sirf / rakhna)
 RewriteBase /office_php_project/kyrapet/
 
-# 1. Sitemap Dynamic Route
+# ==========================================
+# 1. TRAILING SLASH FIX (SEO: Force no trailing slash)
+# ==========================================
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [R=301,L]
+
+# ==========================================
+# 2. GOOGLE INDEXED 404 FIX
+# ==========================================
+RewriteRule ^breeds/breeds\.php$ /breeds [R=301,L]
+
+# ==========================================
+# 3. REDIRECT OLD URLS TO CLEAN NEW URLS (301 Permanent Redirect)
+# ==========================================
+# (A) Redirect old query params (?slug=) to clean routes
+RewriteCond %{THE_REQUEST} \s/+breed\.php\?slug=([a-zA-Z0-9_-]+) [NC]
+RewriteRule ^ /breed/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+page\.php\?slug=([a-zA-Z0-9_-]+) [NC]
+RewriteRule ^ /page/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+category\.php\?slug=([a-zA-Z0-9_-]+) [NC]
+RewriteRule ^ /category/%1? [R=301,L]
+
+# (B) YEH NAYA RULE HAI: Redirect old blog-post query param to NEW /blog/ route
+RewriteCond %{THE_REQUEST} \s/+blog-post\.php\?slug=([a-zA-Z0-9_-]+) [NC]
+RewriteRule ^ /blog/%1? [R=301,L]
+
+# (C) YEH BHI NAYA RULE HAI: Redirect old /blog-post/ route to NEW /blog/ route
+RewriteRule ^blog-post/([a-zA-Z0-9_-]+)$ /blog/$1 [R=301,L]
+
+# ==========================================
+# 4. REDIRECT DIRECT .PHP ACCESS TO CLEAN URLS
+# ==========================================
+RewriteCond %{THE_REQUEST} \s/+([a-zA-Z0-9_-]+)\.php[\s?] [NC]
+RewriteCond %1 !^(index|sitemap|404)$
+RewriteRule ^ /%1 [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+index\.php[\s?] [NC]
+RewriteRule ^ / [R=301,L]
+
+# ==========================================
+# 5. SITEMAP ROUTE
+# ==========================================
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
-# 2. SEO Friendly Routes (Breed, Blog, Custom Pages, Category)
-RewriteRule ^breed/([a-zA-Z0-9_-]+)$ breed.php?slug=$1 [L,QSA]
-RewriteRule ^blog-post/([a-zA-Z0-9_-]+)$ blog-post.php?slug=$1 [L,QSA]
-RewriteRule ^page/([a-zA-Z0-9_-]+)$ page.php?slug=$1 [L,QSA]
-RewriteRule ^category/([a-zA-Z0-9_-]+)$ category.php?slug=$1 [L,QSA]
+# ==========================================
+# 6. INTERNAL ROUTING (Clean URLs -> Backend PHP files)
+# ==========================================
+RewriteRule ^breed/([a-zA-Z0-9_-]+)/?$ breed.php?slug=$1 [L,QSA]
+RewriteRule ^page/([a-zA-Z0-9_-]+)/?$ page.php?slug=$1 [L,QSA]
+RewriteRule ^category/([a-zA-Z0-9_-]+)/?$ category.php?slug=$1 [L,QSA]
 
-# 3. Remove .php extension from normal pages (like /about, /contact)
+# YEH NAYA RULE HAI: Route new /blog/xyz path to backend blog-post.php file
+RewriteRule ^blog/([a-zA-Z0-9_-]+)/?$ blog-post.php?slug=$1 [L,QSA]
+
+# Remove .php extension from normal pages
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^\.]+)$ $1.php [NC,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/?$ $1.php [NC,L]
 
-# 4. 404 Error Page 
+# ==========================================
+# 7. 404 ERROR PAGE 
+# ==========================================
 ErrorDocument 404 /office_php_project/kyrapet/404.php

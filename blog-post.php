@@ -141,7 +141,7 @@ if (function_exists('banner')) {
       <?php foreach($recent as $r): 
         $r_img = (strpos($r['img'], '/') !== false) ? $r['img'] : ph($r['img'], 200);
       ?>
-        <a class="rp" href="blog-post/<?=urlencode($r['slug'])?>">
+        <a class="rp" href="blog/<?=urlencode($r['slug'])?>">
           <img src="<?=h($r_img)?>" alt="<?=h($r['title'])?>">
           <span><b><?=h($r['title'])?></b><small><?=h($r['date'])?></small></span>
         </a>

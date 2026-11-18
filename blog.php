@@ -51,7 +51,7 @@ require __DIR__.'/includes/header.php';
 $display_blog = !empty($db_blog) ? $db_blog : ($blog ?? []);
 $cats  = array_values(array_unique(array_column($display_blog, 'cat')));
 $first = $display_blog[0] ?? null;
-$fu    = $first ? 'blog-post/' . rawurlencode($first['slug']) : '#';
+$fu    = $first ? 'blog/' . rawurlencode($first['slug']) : '#';
 
 if (function_exists('banner')) {
     banner('Pet Care Blog','Blog','Practical tips for new and experienced puppy parents.');

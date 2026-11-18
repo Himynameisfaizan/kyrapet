@@ -40,7 +40,7 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     $blog_q = mysqli_query($conn, "SELECT slug FROM blogs WHERE status = 1");
     if ($blog_q) {
     while ($row = mysqli_fetch_assoc($blog_q)) {
-    addUrlNode($base_url . '/blog-post/' . $row['slug'], 'monthly', '0.7');
+    addUrlNode($base_url . '/blog/' . $row['slug'], 'monthly', '0.7');
     }
     }
 
