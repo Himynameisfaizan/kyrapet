@@ -95,7 +95,7 @@ if (function_exists('banner')) banner('How It Works', 'How It Works', 'Four simp
                         <?php endforeach; } ?>
                     </ul>
                     <div class="cta" style="margin: 26px 0 0;">
-                        <a class="btn btn-teal" href="breeds.php">Browse puppies</a>
+                        <a class="btn btn-teal" href="breeds">Browse puppies</a>
                     </div>
                 </div>
             </div>

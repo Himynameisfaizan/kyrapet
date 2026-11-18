@@ -50,8 +50,8 @@ if (function_exists('banner')) banner('About Kyra Pet Shop', 'About Us', 'A trus
                     puppies. We help families find the right match and support them for life.
                 </p>
                 <div class="cta" style="margin:0;">
-                    <a class="btn btn-teal" href="breeds.php">See our puppies</a>
-                    <a class="btn btn-navy" href="contact.php">Visit the shop</a>
+                    <a class="btn btn-teal" href="breeds">See our puppies</a>
+                    <a class="btn btn-navy" href="contact">Visit the shop</a>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@ if (function_exists('banner')) banner('About Kyra Pet Shop', 'About Us', 'A trus
                         needs.</p>
                     <div class="cta" style="margin:0;">
                         <a class="btn btn-teal" href="tel:<?= h($tel ?? '') ?>">Call <?= h($site['phone'] ?? '') ?></a>
-                        <a class="btn btn-line" href="how-it-works.php">How it works</a>
+                        <a class="btn btn-line" href="how-it-works">How it works</a>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@ if (function_exists('banner')) banner('About Kyra Pet Shop', 'About Us', 'A trus
                 <?php if(!empty($v1)) { foreach(array_slice($v1, 0, 3) as $i=>$v) { if (function_exists('vcard')) echo vcard($v, $i); } } ?>
             </div>
             <div class="center" style="margin-top: 30px;">
-                <a class="btn btn-teal" href="reviews.php">Read and watch more reviews</a>
+                <a class="btn btn-teal" href="reviews">Read and watch more reviews</a>
             </div>
         </div>
     </section>

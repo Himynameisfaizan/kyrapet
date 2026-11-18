@@ -559,7 +559,7 @@ if (function_exists('banner')) {
   </div>
   <?php endif; ?>
 
-  <div class="center" style="margin-top:24px"><a class="btn btn-navy" href="breeds.php">View all breeds</a></div>
+  <div class="center" style="margin-top:24px"><a class="btn btn-navy" href="breeds">View all breeds</a></div>
 </div></section>
 <?php if(function_exists('cta_band')) cta_band(); ?>
 </main>

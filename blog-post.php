@@ -130,7 +130,7 @@ if (function_exists('banner')) {
     <div class="share"><span>Share:</span>
       <a class="pill" target="_blank" rel="noopener" href="https://wa.me/?text=<?=rawurlencode($post['title'].' '.$url)?>">WhatsApp</a>
       <a class="pill" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=<?=rawurlencode($url)?>">Facebook</a>
-      <a class="pill" href="blog.php">← All articles</a></div>
+      <a class="pill" href="blog">← All articles</a></div>
   </article>
   
   <aside class="side">
@@ -141,7 +141,7 @@ if (function_exists('banner')) {
       <?php foreach($recent as $r): 
         $r_img = (strpos($r['img'], '/') !== false) ? $r['img'] : ph($r['img'], 200);
       ?>
-        <a class="rp" href="blog-post.php?slug=<?=urlencode($r['slug'])?>">
+        <a class="rp" href="blog-post/<?=urlencode($r['slug'])?>">
           <img src="<?=h($r_img)?>" alt="<?=h($r['title'])?>">
           <span><b><?=h($r['title'])?></b><small><?=h($r['date'])?></small></span>
         </a>
